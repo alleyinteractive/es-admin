@@ -364,103 +364,138 @@ class Results_List_Table extends \WP_List_Table {
 		 */
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		$es = ES::instance();
 
-		// Setup base filters
-		// @todo remove post_types that the current user can't access
-		$post_types = array_values( get_post_types( [ 'public' => true ] ) );
-		$post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
+		if ( isset( $_GET['es'] ) && '0' === $_GET['es'] ) {
+			$args = [
+				'post_type' => get_post_types( [ 'public' => true ] ),
+				'post_status' => 'any',
+				'posts_per_page' => $per_page,
+				'paged' => $this->get_pagenum(),
+				'ignore_sticky_posts' => true,
+				'perm' => 'readable',
+			];
 
-		$filters = [
-			$es->dsl_terms( $es->map_field( 'post_type' ), $post_types ),
-			[ 'not' => $es->dsl_terms( $es->map_field( 'post_status' ), $post_statuses ) ],
-		];
-
-		// Build the ES args
-		$args = [
-			'filter' => [
-				'and' => $filters,
-			],
-			'fields' => [
-				'post_id',
-			],
-			'from' => 0,
-			'size' => $per_page,
-		];
-
-		// Build the search query
-		if ( ! empty( $_GET['s'] ) ) {
-			$args['query'] = $es->search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
-		}
-
-		// Setup pagination
-		$page = $this->get_pagenum();
-		if ( ! $page ) {
-			$page = 1;
-		}
-		$args['from'] = ( $page - 1 ) * $per_page;
-
-		// Build the sorting
-		if ( ! empty( $_GET['orderby'] ) ) {
-			$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc';
-			switch ( $_GET['orderby'] ) {
-				case 'date' :
-					$orderby = 'post_date';
-					break;
+			if ( ! empty( $_GET['s'] ) ) {
+				$args['s'] = sanitize_text_field( wp_unslash( $_GET['s'] ) );
+				$args['orderby'] = 'relevance';
+				$args['order'] = 'DESC';
 			}
-			$args['sort'] = [
-				[ $es->map_field( $orderby ) => $order ],
-			];
-		} elseif ( ! empty( $_GET['s'] ) ) {
-			$args['sort'] = [
-				'_score',
-				[ $es->map_field( 'post_date' ) => 'desc' ],
-			];
+
+			if ( ! empty( $_GET['orderby'] ) ) {
+				$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+			}
+			if ( ! empty( $_GET['order'] ) ) {
+				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
+			}
+
+			$query = new \WP_Query;
+			$this->items = $query->query( $args );
+
+			$this->set_pagination_args( array(
+				'total_items' => $query->found_posts,
+				'per_page'    => $per_page,
+			) );
 		} else {
-			$args['sort'] = [
-				[ $es->map_field( 'post_date' ) => 'desc' ],
+			$es = ES::instance();
+
+			// Setup base filters
+			// @todo remove post_types that the current user can't access
+			$post_types = array_values( get_post_types( [ 'public' => true ] ) );
+			$post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
+
+			$filters = [
+				$es->dsl_terms( $es->map_field( 'post_type' ), $post_types ),
+				[ 'not' => $es->dsl_terms( $es->map_field( 'post_status' ), $post_statuses ) ],
 			];
-		}
 
-		$this->items = [];
+			// Build the ES args
+			$args = [
+				'filter' => [
+					'and' => $filters,
+				],
+				'fields' => [
+					'post_id',
+				],
+				'from' => 0,
+				'size' => $per_page,
+			];
 
-		$es_response = $es->query( $args );
-		if ( empty( $es_response['hits']['hits'] ) ) {
-			$this->items = [];
-			return;
-		}
-
-		$post_ids = array();
-		foreach ( $es_response['hits']['hits'] as $hit ) {
-			if ( empty( $hit['fields'][ $es->map_field( 'post_id' ) ] ) ) {
-				continue;
+			// Build the search query
+			if ( ! empty( $_GET['s'] ) ) {
+				$args['query'] = $es->search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
 			}
 
-			$post_id = (array) $hit['fields'][ $es->map_field( 'post_id' ) ];
-			$post_ids[] = absint( reset( $post_id ) );
-		}
+			// Setup pagination
+			$page = $this->get_pagenum();
+			if ( ! $page ) {
+				$page = 1;
+			}
+			$args['from'] = ( $page - 1 ) * $per_page;
 
-		$post_ids = array_filter( $post_ids );
-		if ( empty( $post_ids ) ) {
+			// Build the sorting
+			if ( ! empty( $_GET['orderby'] ) ) {
+				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc';
+				switch ( $_GET['orderby'] ) {
+					case 'date' :
+						$orderby = 'post_date';
+						break;
+				}
+				$args['sort'] = [
+					[ $es->map_field( $orderby ) => $order ],
+				];
+			} elseif ( ! empty( $_GET['s'] ) ) {
+				$args['sort'] = [
+					'_score',
+					[ $es->map_field( 'post_date' ) => 'desc' ],
+				];
+			} else {
+				$args['sort'] = [
+					[ $es->map_field( 'post_date' ) => 'desc' ],
+				];
+			}
+
 			$this->items = [];
-			return;
+
+			$es_response = $es->query( $args );
+			if ( empty( $es_response['hits']['hits'] ) ) {
+				$this->items = [];
+				return;
+			}
+
+			$post_ids = array();
+			foreach ( $es_response['hits']['hits'] as $hit ) {
+				if ( empty( $hit['fields'][ $es->map_field( 'post_id' ) ] ) ) {
+					continue;
+				}
+
+				$post_id = (array) $hit['fields'][ $es->map_field( 'post_id' ) ];
+				$post_ids[] = absint( reset( $post_id ) );
+			}
+
+			$post_ids = array_filter( $post_ids );
+			if ( empty( $post_ids ) ) {
+				$this->items = [];
+				return;
+			}
+
+			$query = new \WP_Query;
+			$this->items = $query->query( [
+				'post_type' => get_post_types(),
+				'post_status' => 'any',
+				'posts_per_page' => $per_page,
+				'ignore_sticky_posts' => true,
+				'perm' => 'readable',
+				'post__in' => $post_ids,
+				'orderby' => 'post__in',
+			] );
+
+			if ( isset( $es_response['hits']['total'] ) ) {
+				$this->set_pagination_args( [
+					'total_items' => absint( $es_response['hits']['total'] ),
+					'per_page'    => $per_page,
+				] );
+			}
 		}
-
-		$query = new \WP_Query;
-		$this->items = $query->query( [
-			'post_type' => get_post_types(),
-			'post_status' => 'any',
-			'posts_per_page' => $per_page,
-			'ignore_sticky_posts' => true,
-			'perm' => 'readable',
-			'post__in' => $post_ids,
-			'orderby' => 'post__in',
-		] );
-
-		$this->set_pagination_args( array(
-			'total_items' => $query->found_posts,
-			'per_page'    => $per_page,
-		) );
 	}
 
 	/**
