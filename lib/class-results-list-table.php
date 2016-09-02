@@ -5,37 +5,25 @@ if ( ! class_exists( '\WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-/************************** CREATE A PACKAGE CLASS *****************************
- *******************************************************************************
- * Create a new list table package that extends the core WP_List_Table class.
- * WP_List_Table contains most of the framework for generating the table, but we
- * need to define and override some methods so that our data can be displayed
- * exactly the way we need it to be.
+/**
+ * Search results list table.
  *
- * To display this example on a page, you will first need to instantiate the class,
- * then call $yourInstance->prepare_items() to handle any data manipulation, then
- * finally call $yourInstance->display() to render the table to the page.
- *
- * Our theme for this list table is going to be movies.
+ * This code is mostly copied from WordPress Core's WP_Posts_List_Table.
  */
 class Results_List_Table extends \WP_List_Table {
 
-	/** ************************************************************************
-	 * REQUIRED. Set up a constructor that references the parent constructor. We
-	 * use the parent reference to set some default configs.
-	 ***************************************************************************/
-	function __construct(){
+	function __construct() {
 		global $status, $page;
 
 		// Set parent defaults
 		parent::__construct( [
 			'singular'  => __( 'result', 'es-admin' ),
 			'plural'    => __( 'results', 'es-admin' ),
-			'ajax'      => true
+			'ajax'      => true,
 		] );
 	}
 
-	function get_columns(){
+	function get_columns() {
 		return [
 			'thumbnail' => _x( 'Thumbnail', 'column name', 'es-admin' ),
 			'title'     => _x( 'Title', 'column name', 'es-admin' ),
@@ -77,9 +65,9 @@ class Results_List_Table extends \WP_List_Table {
 	 * @param string  $primary
 	 */
 	protected function _column_title( $post, $classes, $data, $primary ) {
-		echo '<td class="' . $classes . ' page-title" ', $data, '>';
-		echo $this->column_title( $post );
-		echo $this->handle_row_actions( $post, 'title', $primary );
+		echo '<td class="' . esc_attr( $classes ) . ' page-title" ' . esc_html( $data ) . '>';
+		echo $this->column_title( $post ); // WPCS: XSS ok.
+		echo $this->handle_row_actions( $post, 'title', $primary ); // WPCS: XSS ok.
 		echo '</td>';
 	}
 
@@ -89,7 +77,7 @@ class Results_List_Table extends \WP_List_Table {
 	 * @param WP_Post $post The current WP_Post object.
 	 */
 	public function column_title( $post ) {
-		echo "<strong>";
+		echo '<strong>';
 
 		$format = get_post_format( $post->ID );
 		if ( $format ) {
@@ -101,43 +89,47 @@ class Results_List_Table extends \WP_List_Table {
 				'post_format' => $format,
 			);
 
-			echo $this->get_edit_link( $format_args, $label . ':', $format_class );
+			$this->get_edit_link( $format_args, $label . ':', $format_class, true );
 		}
 
 		$can_edit_post = current_user_can( 'edit_post', $post->ID );
 		$title = _draft_or_post_title();
 
-		if ( $can_edit_post && $post->post_status != 'trash' ) {
+		if ( $can_edit_post && 'trash' !== $post->post_status ) {
 			printf(
 				'<a class="row-title" href="%s" aria-label="%s">%s</a>',
-				get_edit_post_link( $post->ID ),
+				esc_url( get_edit_post_link( $post->ID ) ),
 				/* translators: %s: post title */
-				esc_attr( sprintf( __( '&#8220;%s&#8221; (Edit)' ), $title ) ),
-				$title
+				esc_attr( sprintf( __( '&#8220;%s&#8221; (Edit)', 'es-admin' ), $title ) ),
+				esc_html( $title )
 			);
 		} else {
-			echo $title;
+			echo esc_html( $title );
 		}
 		_post_states( $post );
 
 		if ( isset( $parent_name ) ) {
 			$post_type_object = get_post_type_object( $post->post_type );
-			echo ' | ' . $post_type_object->labels->parent_item_colon . ' ' . esc_html( $parent_name );
+			echo esc_html( ' | ' . $post_type_object->labels->parent_item_colon . ' ' . $parent_name );
 		}
 		echo "</strong>\n";
 
-		if ( $can_edit_post && $post->post_status != 'trash' ) {
+		if ( $can_edit_post && 'trash' !== $post->post_status ) {
 			$lock_holder = wp_check_post_lock( $post->ID );
 
 			if ( $lock_holder ) {
 				$lock_holder = get_userdata( $lock_holder );
-				$locked_avatar = get_avatar( $lock_holder->ID, 18 );
-				$locked_text = esc_html( sprintf( __( '%s is currently editing' ), $lock_holder->display_name ) );
+				$locked_avatar_html = get_avatar( $lock_holder->ID, 18 );
+				$locked_text = sprintf( __( '%s is currently editing', 'es-admin' ), $lock_holder->display_name );
 			} else {
-				$locked_avatar = $locked_text = '';
+				$locked_avatar_html = $locked_text = '';
 			}
 
-			echo '<div class="locked-info"><span class="locked-avatar">' . $locked_avatar . '</span> <span class="locked-text">' . $locked_text . "</span></div>\n";
+			echo '<div class="locked-info"><span class="locked-avatar">' . // WPCS: XSS ok.
+				$locked_avatar_html .
+				'</span> <span class="locked-text">' .
+				esc_html( $locked_text ) .
+				"</span></div>\n";
 		}
 
 		get_inline_data( $post );
@@ -174,53 +166,33 @@ class Results_List_Table extends \WP_List_Table {
 		}
 
 		if ( 'publish' === $post->post_status ) {
-			_e( 'Published', 'es-admin' );
+			esc_html_e( 'Published', 'es-admin' );
 		} elseif ( 'future' === $post->post_status ) {
 			if ( $time_diff > 0 ) {
-				echo '<strong class="error-message">' . __( 'Missed schedule', 'es-admin' ) . '</strong>';
+				echo '<strong class="error-message">' . esc_html__( 'Missed schedule', 'es-admin' ) . '</strong>';
 			} else {
-				_e( 'Scheduled', 'es-admin' );
+				esc_html_e( 'Scheduled', 'es-admin' );
 			}
 		} else {
-			_e( 'Last Modified', 'es-admin' );
+			esc_html_e( 'Last Modified', 'es-admin' );
 		}
 		echo '<br />';
-		if ( 'excerpt' === $mode ) {
-			/**
-			 * Filter the published time of the post.
-			 *
-			 * If `$mode` equals 'excerpt', the published time and date are both displayed.
-			 * If `$mode` equals 'list' (default), the publish date is displayed, with the
-			 * time and date together available as an abbreviation definition.
-			 *
-			 * @since 2.5.1
-			 *
-			 * @param string  $t_time      The published time.
-			 * @param WP_Post $post        Post object.
-			 * @param string  $column_name The column name.
-			 * @param string  $mode        The list display mode ('excerpt' or 'list').
-			 */
-			echo apply_filters( 'post_date_column_time', $t_time, $post, 'date', $mode );
-		} else {
 
-			/** This filter is documented in wp-admin/includes/class-wp-posts-list-table.php */
-			echo '<abbr title="' . $t_time . '">' . apply_filters( 'post_date_column_time', $h_time, $post, 'date', $mode ) . '</abbr>';
-		}
-	}
-
-	/**
-	 * Handles the checkbox column output.
-	 *
-	 * @param WP_Post $post The current WP_Post object.
-	 */
-	public function column_cb( $post ) {
-		if ( current_user_can( 'edit_post', $post->ID ) ): ?>
-			<label class="screen-reader-text" for="cb-select-<?php the_ID(); ?>"><?php
-				printf( __( 'Select %s' ), _draft_or_post_title() );
-			?></label>
-			<input id="cb-select-<?php the_ID(); ?>" type="checkbox" name="post[]" value="<?php the_ID(); ?>" />
-			<div class="locked-indicator"></div>
-		<?php endif;
+		/**
+		 * Filter the published time of the post.
+		 *
+		 * If `$mode` equals 'excerpt', the published time and date are both displayed.
+		 * If `$mode` equals 'list' (default), the publish date is displayed, with the
+		 * time and date together available as an abbreviation definition.
+		 *
+		 * @since 2.5.1
+		 *
+		 * @param string  $t_time      The published time.
+		 * @param WP_Post $post        Post object.
+		 * @param string  $column_name The column name.
+		 * @param string  $mode        The list display mode ('excerpt' or 'list').
+		 */
+		echo '<abbr title="' . esc_attr( $t_time ) . '">' . esc_html( apply_filters( 'post_date_column_time', $h_time, $post, 'date', $mode ) ) . '</abbr>';
 	}
 
 	/**
@@ -233,9 +205,9 @@ class Results_List_Table extends \WP_List_Table {
 	 */
 	public function column_author( $post ) {
 		$args = array(
-			'author' => get_the_author_meta( 'ID' )
+			'author' => get_the_author_meta( 'ID' ),
 		);
-		echo $this->get_edit_link( $args, get_the_author() );
+		$this->get_edit_link( $args, get_the_author(), '', true );
 	}
 
 	public function column_thumbnail( $post ) {
@@ -274,7 +246,7 @@ class Results_List_Table extends \WP_List_Table {
 			$taxonomy_object = get_taxonomy( $taxonomy );
 			$terms = get_the_terms( $post->ID, $taxonomy );
 			if ( is_array( $terms ) ) {
-				$out = array();
+				$out_html = array();
 				foreach ( $terms as $t ) {
 					$posts_in_term_qv = array();
 					if ( 'post' != $post->post_type ) {
@@ -287,13 +259,13 @@ class Results_List_Table extends \WP_List_Table {
 						$posts_in_term_qv['term'] = $t->slug;
 					}
 
-					$label = esc_html( sanitize_term_field( 'name', $t->name, $t->term_id, $taxonomy, 'display' ) );
-					$out[] = $this->get_edit_link( $posts_in_term_qv, $label );
+					$label = sanitize_term_field( 'name', $t->name, $t->term_id, $taxonomy, 'display' );
+					$out_html[] = $this->get_edit_link( $posts_in_term_qv, $label );
 				}
 				/* translators: used between list items, there is a space after the comma */
-				echo join( __( ', ' ), $out );
+				echo join( esc_html__( ', ', 'es-admin' ), $out_html ); // WPCS: XSS ok.
 			} else {
-				echo '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . $taxonomy_object->labels->no_terms . '</span>';
+				echo '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . esc_html( $taxonomy_object->labels->no_terms ) . '</span>';
 			}
 			return;
 		}
@@ -344,27 +316,13 @@ class Results_List_Table extends \WP_List_Table {
 	function prepare_items() {
 		$per_page = 20;
 
-		/**
-		 * REQUIRED. Now we need to define our column headers. This includes a complete
-		 * array of columns to be displayed (slugs & titles), a list of columns
-		 * to keep hidden, and a list of columns that are sortable. Each of these
-		 * can be defined in another method (as we've done here) before being
-		 * used to build the value for our _column_headers property.
-		 */
 		$columns = $this->get_columns();
 		$hidden = array();
 		$sortable = $this->get_sortable_columns();
 
-
-		/**
-		 * REQUIRED. Finally, we build an array to be used by the class for column
-		 * headers. The $this->_column_headers property takes an array which contains
-		 * 3 other arrays. One for all columns, one for hidden columns, and one
-		 * for sortable columns.
-		 */
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-
+		// You can bypass Elasticsearch and instead use WP_Query by adding es=0 to the url
 		if ( isset( $_GET['es'] ) && '0' === $_GET['es'] ) {
 			$args = [
 				'post_type' => get_post_types( [ 'public' => true ] ),
@@ -434,7 +392,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Build the sorting
 			if ( ! empty( $_GET['orderby'] ) ) {
-				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc';
+				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc'; // WPCS: sanitization ok.
 				switch ( $_GET['orderby'] ) {
 					case 'date' :
 						$orderby = 'post_date';
@@ -506,9 +464,10 @@ class Results_List_Table extends \WP_List_Table {
 	 * @param array  $args  URL parameters for the link.
 	 * @param string $label Link text.
 	 * @param string $class Optional. Class attribute. Default empty string.
+	 * @param bool $echo Optional. Output or return. Defaults to false (return).
 	 * @return string The formatted link string.
 	 */
-	protected function get_edit_link( $args, $label, $class = '' ) {
+	protected function get_edit_link( $args, $label, $class = '', $echo = false ) {
 		if ( empty( $args['page'] ) ) {
 			$args['page'] = 'es-admin-search';
 		}
@@ -516,18 +475,23 @@ class Results_List_Table extends \WP_List_Table {
 
 		$class_html = '';
 		if ( ! empty( $class ) ) {
-			 $class_html = sprintf(
+			$class_html = sprintf(
 				' class="%s"',
 				esc_attr( $class )
 			);
 		}
 
-		return sprintf(
+		$link_html = sprintf(
 			'<a href="%s"%s>%s</a>',
 			esc_url( $url ),
 			$class_html,
-			$label
+			esc_html( $label )
 		);
+		if ( $echo ) {
+			echo $link_html; // WPCS: XSS ok.
+		} else {
+			return $link_html;
+		}
 	}
 
 	public function single_row( $post ) {
@@ -561,8 +525,8 @@ class Results_List_Table extends \WP_List_Table {
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link( $post->ID ),
 				/* translators: %s: post title */
-				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) ),
-				__( 'Edit' )
+				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;', 'es-admin' ), $title ) ),
+				esc_html__( 'Edit', 'es-admin' )
 			);
 		}
 
@@ -572,16 +536,16 @@ class Results_List_Table extends \WP_List_Table {
 					'<a href="%s" aria-label="%s">%s</a>',
 					wp_nonce_url( admin_url( sprintf( $post_type_object->_edit_link . '&amp;action=untrash', $post->ID ) ), 'untrash-post_' . $post->ID ),
 					/* translators: %s: post title */
-					esc_attr( sprintf( __( 'Restore &#8220;%s&#8221; from the Trash' ), $title ) ),
-					__( 'Restore' )
+					esc_attr( sprintf( __( 'Restore &#8220;%s&#8221; from the Trash', 'es-admin' ), $title ) ),
+					esc_html__( 'Restore', 'es-admin' )
 				);
 			} elseif ( EMPTY_TRASH_DAYS ) {
 				$actions['trash'] = sprintf(
 					'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
 					get_delete_post_link( $post->ID ),
 					/* translators: %s: post title */
-					esc_attr( sprintf( __( 'Move &#8220;%s&#8221; to the Trash' ), $title ) ),
-					_x( 'Trash', 'verb' )
+					esc_attr( sprintf( __( 'Move &#8220;%s&#8221; to the Trash', 'es-admin' ), $title ) ),
+					esc_html_x( 'Trash', 'verb', 'es-admin' )
 				);
 			}
 			if ( 'trash' === $post->post_status || ! EMPTY_TRASH_DAYS ) {
@@ -589,8 +553,8 @@ class Results_List_Table extends \WP_List_Table {
 					'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
 					get_delete_post_link( $post->ID, '', true ),
 					/* translators: %s: post title */
-					esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently' ), $title ) ),
-					__( 'Delete Permanently' )
+					esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently', 'es-admin' ), $title ) ),
+					esc_html__( 'Delete Permanently', 'es-admin' )
 				);
 			}
 		}
@@ -603,17 +567,17 @@ class Results_List_Table extends \WP_List_Table {
 						'<a href="%s" rel="permalink" aria-label="%s">%s</a>',
 						esc_url( $preview_link ),
 						/* translators: %s: post title */
-						esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;' ), $title ) ),
-						__( 'Preview' )
+						esc_attr( sprintf( __( 'Preview &#8220;%s&#8221;', 'es-admin' ), $title ) ),
+						esc_html__( 'Preview', 'es-admin' )
 					);
 				}
 			} elseif ( 'trash' != $post->post_status ) {
 				$actions['view'] = sprintf(
 					'<a href="%s" rel="permalink" aria-label="%s">%s</a>',
-					get_permalink( $post->ID ),
+					esc_url( get_permalink( $post->ID ) ),
 					/* translators: %s: post title */
-					esc_attr( sprintf( __( 'View &#8220;%s&#8221;' ), $title ) ),
-					__( 'View' )
+					esc_attr( sprintf( __( 'View &#8220;%s&#8221;', 'es-admin' ), $title ) ),
+					esc_html__( 'View', 'es-admin' )
 				);
 			}
 		}
