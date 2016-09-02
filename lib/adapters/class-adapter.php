@@ -1,10 +1,15 @@
 <?php
+/**
+ * Abstract adapter class.
+ *
+ * @package ES Admin
+ */
+
 namespace ES_Admin\Adapters;
 
 /**
  * Abstract adapter class
  */
-
 abstract class Adapter {
 	/**
 	 * Map core fields to the ES index.
@@ -40,6 +45,8 @@ abstract class Adapter {
 	 * 		post_type
 	 * 		post_mime_type
 	 * 		comment_count
+	 *
+	 * @var array
 	 */
 	protected $field_map = [
 		'post_meta'          => 'post_meta.%s',

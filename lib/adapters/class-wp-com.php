@@ -1,12 +1,20 @@
 <?php
+/**
+ * WordPress.com adapter.
+ *
+ * @package ES Admin
+ */
+
 namespace ES_Admin\Adapters;
 
 /**
- * An adapter for WordPress.com VIP
+ * An adapter for WordPress.com VIP.
  */
-
 class WP_Com extends Adapter {
 
+	/**
+	 * Build the object and set the field map.
+	 */
 	public function __construct() {
 		$this->field_map['post_author']                   = 'author_id';
 		$this->field_map['post_date']                     = 'date';
@@ -34,8 +42,8 @@ class WP_Com extends Adapter {
 		$this->field_map['post_title']                    = 'title';
 		$this->field_map['post_title.analyzed']           = 'title';
 		$this->field_map['post_excerpt']                  = 'excerpt';
-		$this->field_map['post_password']                 = 'post_password';  // this isn't indexed on wordpress.com
-		$this->field_map['post_name']                     = 'post_name';      // this isn't indexed on wordpress.com
+		$this->field_map['post_password']                 = 'post_password';  // this isn't indexed on wordpress.com.
+		$this->field_map['post_name']                     = 'post_name';      // this isn't indexed on wordpress.com.
 		$this->field_map['post_modified']                 = 'modified';
 		$this->field_map['post_modified.year']            = 'modified_token.year';
 		$this->field_map['post_modified.month']           = 'modified_token.month';
@@ -57,9 +65,9 @@ class WP_Com extends Adapter {
 		$this->field_map['post_modified_gmt.minute']      = 'modified_gmt_token.minute';
 		$this->field_map['post_modified_gmt.second']      = 'modified_gmt_token.second';
 		$this->field_map['post_parent']                   = 'parent_post_id';
-		$this->field_map['menu_order']                    = 'menu_order';     // this isn't indexed on wordpress.com
-		$this->field_map['post_mime_type']                = 'post_mime_type'; // this isn't indexed on wordpress.com
-		$this->field_map['comment_count']                 = 'comment_count';  // this isn't indexed on wordpress.com
+		$this->field_map['menu_order']                    = 'menu_order';     // this isn't indexed on wordpress.com.
+		$this->field_map['post_mime_type']                = 'post_mime_type'; // this isn't indexed on wordpress.com.
+		$this->field_map['comment_count']                 = 'comment_count';  // this isn't indexed on wordpress.com.
 		$this->field_map['post_meta']                     = 'meta.%s.value.raw_lc';
 		$this->field_map['post_meta.analyzed']            = 'meta.%s.value';
 		$this->field_map['post_meta.long']                = 'meta.%s.long';
@@ -76,6 +84,12 @@ class WP_Com extends Adapter {
 		$this->field_map['tag_name']                      = 'tag.name.raw';
 	}
 
+	/**
+	 * Run a query against the ES index.
+	 *
+	 * @param  array $es_args Elasticsearch DSL as a PHP array.
+	 * @return array Elasticsearch response as a PHP array.
+	 */
 	public function query( $es_args ) {
 		if ( function_exists( 'es_api_search_index' ) ) {
 			return es_api_search_index( $es_args, 'es-wp-query' );

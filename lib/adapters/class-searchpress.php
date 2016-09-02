@@ -1,12 +1,20 @@
 <?php
+/**
+ * SearchPress adapter.
+ *
+ * @package ES Admin
+ */
+
 namespace ES_Admin\Adapters;
 
 /**
  * An adapter for SearchPress
  */
-
 class SearchPress extends Adapter {
 
+	/**
+	 * Build the object and set the field map.
+	 */
 	public function __construct() {
 		$this->field_map['post_name']             = 'post_name.raw';
 		$this->field_map['post_title']            = 'post_title.raw';
@@ -27,6 +35,12 @@ class SearchPress extends Adapter {
 		$this->field_map['tag_name']              = 'terms.%s.name.raw';
 	}
 
+	/**
+	 * Run a query against the ES index.
+	 *
+	 * @param  array $es_args Elasticsearch DSL as a PHP array.
+	 * @return array Elasticsearch response as a PHP array.
+	 */
 	public function query( $es_args ) {
 		return SP_API()->search( json_encode( $es_args ), [ 'output' => ARRAY_A ] );
 	}

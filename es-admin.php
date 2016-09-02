@@ -11,6 +11,7 @@
  *
  * @package         ES Admin
  */
+
 /*
 	Copyright 2014-2016 Matthew Boynes, Alley Interactive
 
@@ -39,14 +40,14 @@ namespace ES_Admin;
 define( __NAMESPACE__ . '\PATH', __DIR__ );
 define( __NAMESPACE__ . '\URL', trailingslashit( plugins_url( '', __FILE__ ) ) );
 
-// Custom autoloader
+// Custom autoloader.
 require_once( PATH . '/lib/autoload.php' );
 
-// Singleton trait
+// Singleton trait.
 require_once( PATH . '/lib/trait-singleton.php' );
 
-// Assorted Functions
+// Assorted Functions.
 require_once( PATH . '/lib/functions.php' );
 
-// Load the main controller class
+// Load the main controller class.
 add_action( 'after_setup_theme', [ '\ES_Admin\Controller', 'instance' ] );

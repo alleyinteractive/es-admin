@@ -1,4 +1,10 @@
 <?php
+/**
+ * Plugin controller.
+ *
+ * @package ES Admin
+ */
+
 namespace ES_Admin;
 
 /**
@@ -7,14 +13,23 @@ namespace ES_Admin;
 class Controller {
 	use Singleton;
 
+	/**
+	 * Build the singleton.
+	 */
 	public function setup() {
 		add_action( 'admin_menu', [ $this, 'add_search_page' ] );
 	}
 
+	/**
+	 * Register the menu link.
+	 */
 	public function add_search_page() {
 		add_menu_page( __( 'Search', 'es-admin' ), __( 'Search', 'es-admin' ), 'edit_posts', 'es-admin-search', [ $this, 'search_page' ], 'dashicons-search', '1.1' );
 	}
 
+	/**
+	 * Output the search page.
+	 */
 	public function search_page() {
 		$results = new Results_List_Table();
 		$results->prepare_items();

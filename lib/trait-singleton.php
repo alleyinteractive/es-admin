@@ -1,6 +1,8 @@
 <?php
 /**
  * Trait file for Singletons.
+ *
+ * @package ES Admin
  */
 
 namespace ES_Admin;
@@ -33,6 +35,6 @@ trait Singleton {
 	 * Setup the singleton.
 	 */
 	public function setup() {
-		// Silence
+		// Silence.
 	}
 }

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Autoloader.
+ *
+ * @package ES Admin
+ */
+
 namespace ES_Admin;
 
 /**

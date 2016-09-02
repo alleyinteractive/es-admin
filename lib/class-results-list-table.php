@@ -1,4 +1,10 @@
 <?php
+/**
+ * Search results list table.
+ *
+ * @package ES Admin
+ */
+
 namespace ES_Admin;
 
 if ( ! class_exists( '\WP_List_Table' ) ) {
@@ -12,10 +18,10 @@ if ( ! class_exists( '\WP_List_Table' ) ) {
  */
 class Results_List_Table extends \WP_List_Table {
 
+	/**
+	 * Build the object, setting the defaults.
+	 */
 	function __construct() {
-		global $status, $page;
-
-		// Set parent defaults
 		parent::__construct( [
 			'singular'  => __( 'result', 'es-admin' ),
 			'plural'    => __( 'results', 'es-admin' ),
@@ -23,6 +29,11 @@ class Results_List_Table extends \WP_List_Table {
 		] );
 	}
 
+	/**
+	 * Get the columns to output.
+	 *
+	 * @return array
+	 */
 	function get_columns() {
 		return [
 			'thumbnail' => _x( 'Thumbnail', 'column name', 'es-admin' ),
@@ -35,6 +46,8 @@ class Results_List_Table extends \WP_List_Table {
 	}
 
 	/**
+	 * Get the sortable columns.
+	 *
 	 * @return array
 	 */
 	protected function get_sortable_columns() {
@@ -50,7 +63,7 @@ class Results_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * Gets the name of the primary column.
+	 * Get the name of the primary column.
 	 *
 	 * @return string The name of the primary column.
 	 */
@@ -59,10 +72,12 @@ class Results_List_Table extends \WP_List_Table {
 	}
 
 	/**
-	 * @param WP_Post $post
-	 * @param string  $classes
-	 * @param string  $data
-	 * @param string  $primary
+	 * Output the column title outer wrapper.
+	 *
+	 * @param \WP_Post $post Current post object.
+	 * @param string   $classes The classes for the <td> element.
+	 * @param string   $data The data attributes for the <td> element.
+	 * @param string   $primary The primary column.
 	 */
 	protected function _column_title( $post, $classes, $data, $primary ) {
 		echo '<td class="' . esc_attr( $classes ) . ' page-title" ' . esc_html( $data ) . '>';
@@ -74,7 +89,7 @@ class Results_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the title column output.
 	 *
-	 * @param WP_Post $post The current WP_Post object.
+	 * @param \WP_Post $post The current WP_Post object.
 	 */
 	public function column_title( $post ) {
 		echo '<strong>';
@@ -138,16 +153,9 @@ class Results_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the post date column output.
 	 *
-	 * @since 4.3.0
-	 * @access public
-	 *
-	 * @global string $mode
-	 *
-	 * @param WP_Post $post The current WP_Post object.
+	 * @param \WP_Post $post The current WP_Post object.
 	 */
 	public function column_date( $post ) {
-		global $mode;
-
 		if ( '0000-00-00 00:00:00' === $post->post_date ) {
 			$t_time = $h_time = __( 'Unpublished', 'es-admin' );
 			$time_diff = 0;
@@ -181,27 +189,18 @@ class Results_List_Table extends \WP_List_Table {
 		/**
 		 * Filter the published time of the post.
 		 *
-		 * If `$mode` equals 'excerpt', the published time and date are both displayed.
-		 * If `$mode` equals 'list' (default), the publish date is displayed, with the
-		 * time and date together available as an abbreviation definition.
-		 *
-		 * @since 2.5.1
-		 *
 		 * @param string  $t_time      The published time.
-		 * @param WP_Post $post        Post object.
+		 * @param \WP_Post $post        Post object.
 		 * @param string  $column_name The column name.
 		 * @param string  $mode        The list display mode ('excerpt' or 'list').
 		 */
-		echo '<abbr title="' . esc_attr( $t_time ) . '">' . esc_html( apply_filters( 'post_date_column_time', $h_time, $post, 'date', $mode ) ) . '</abbr>';
+		echo '<abbr title="' . esc_attr( $t_time ) . '">' . esc_html( apply_filters( 'post_date_column_time', $h_time, $post, 'date', 'list' ) ) . '</abbr>';
 	}
 
 	/**
 	 * Handles the post author column output.
 	 *
-	 * @since 4.3.0
-	 * @access public
-	 *
-	 * @param WP_Post $post The current WP_Post object.
+	 * @param \WP_Post $post The current WP_Post object.
 	 */
 	public function column_author( $post ) {
 		$args = array(
@@ -210,6 +209,11 @@ class Results_List_Table extends \WP_List_Table {
 		$this->get_edit_link( $args, get_the_author(), '', true );
 	}
 
+	/**
+	 * Handles the thumbnail column output.
+	 *
+	 * @param \WP_Post $post The current WP_Post object.
+	 */
 	public function column_thumbnail( $post ) {
 		if ( has_post_thumbnail( $post ) ) {
 			echo get_the_post_thumbnail( $post, [ 100, 100 ] );
@@ -218,6 +222,11 @@ class Results_List_Table extends \WP_List_Table {
 		}
 	}
 
+	/**
+	 * Handles the post type column output.
+	 *
+	 * @param \WP_Post $post The current WP_Post object.
+	 */
 	public function column_post_type( $post ) {
 		$post_type_object = get_post_type_object( $post->post_type );
 		echo esc_html( $post_type_object->labels->singular_name );
@@ -226,11 +235,8 @@ class Results_List_Table extends \WP_List_Table {
 	/**
 	 * Handles the default column output.
 	 *
-	 * @since 4.3.0
-	 * @access public
-	 *
-	 * @param WP_Post $post        The current WP_Post object.
-	 * @param string  $column_name The current column name.
+	 * @param \WP_Post $post        The current WP_Post object.
+	 * @param string   $column_name The current column name.
 	 */
 	public function column_default( $post, $column_name ) {
 		if ( 'categories' === $column_name ) {
@@ -313,6 +319,9 @@ class Results_List_Table extends \WP_List_Table {
 		do_action( "manage_{$post->post_type}_posts_custom_column", $column_name, $post->ID );
 	}
 
+	/**
+	 * Query and set the items to display in the table.
+	 */
 	function prepare_items() {
 		$per_page = 20;
 
@@ -322,7 +331,8 @@ class Results_List_Table extends \WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		// You can bypass Elasticsearch and instead use WP_Query by adding es=0 to the url
+		// You can bypass Elasticsearch and instead use WP_Query by adding es=0
+		// to the url.
 		if ( isset( $_GET['es'] ) && '0' === $_GET['es'] ) {
 			$args = [
 				'post_type' => get_post_types( [ 'public' => true ] ),
@@ -356,8 +366,8 @@ class Results_List_Table extends \WP_List_Table {
 		} else {
 			$es = ES::instance();
 
-			// Setup base filters
-			// @todo remove post_types that the current user can't access
+			// Setup base filters.
+			// @todo remove post_types that the current user can't access.
 			$post_types = array_values( get_post_types( [ 'public' => true ] ) );
 			$post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
 
@@ -366,7 +376,7 @@ class Results_List_Table extends \WP_List_Table {
 				[ 'not' => $es->dsl_terms( $es->map_field( 'post_status' ), $post_statuses ) ],
 			];
 
-			// Build the ES args
+			// Build the ES args.
 			$args = [
 				'filter' => [
 					'and' => $filters,
@@ -378,19 +388,19 @@ class Results_List_Table extends \WP_List_Table {
 				'size' => $per_page,
 			];
 
-			// Build the search query
+			// Build the search query.
 			if ( ! empty( $_GET['s'] ) ) {
 				$args['query'] = $es->search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
 			}
 
-			// Setup pagination
+			// Setup pagination.
 			$page = $this->get_pagenum();
 			if ( ! $page ) {
 				$page = 1;
 			}
 			$args['from'] = ( $page - 1 ) * $per_page;
 
-			// Build the sorting
+			// Build the sorting.
 			if ( ! empty( $_GET['orderby'] ) ) {
 				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc'; // WPCS: sanitization ok.
 				switch ( $_GET['orderby'] ) {
@@ -464,7 +474,7 @@ class Results_List_Table extends \WP_List_Table {
 	 * @param array  $args  URL parameters for the link.
 	 * @param string $label Link text.
 	 * @param string $class Optional. Class attribute. Default empty string.
-	 * @param bool $echo Optional. Output or return. Defaults to false (return).
+	 * @param bool   $echo Optional. Output or return. Defaults to false (return).
 	 * @return string The formatted link string.
 	 */
 	protected function get_edit_link( $args, $label, $class = '', $echo = false ) {
@@ -494,12 +504,20 @@ class Results_List_Table extends \WP_List_Table {
 		}
 	}
 
+	/**
+	 * Output a single row.
+	 *
+	 * Sets up postdata and the global post.
+	 *
+	 * @param  \WP_Post $post The current post object.
+	 */
 	public function single_row( $post ) {
 		$post = get_post( $post );
 
-		$GLOBALS['post'] = $post;
+		$GLOBALS['post'] = $post; // WPCS: override ok.
+
 		setup_postdata( $post );
-		return parent::single_row( $post );
+		parent::single_row( $post );
 	}
 
 	/**
@@ -594,7 +612,7 @@ class Results_List_Table extends \WP_List_Table {
 			 * @param array $actions An array of row action links. Defaults are
 			 *                         'Edit', 'Quick Edit', 'Restore, 'Trash',
 			 *                         'Delete Permanently', 'Preview', and 'View'.
-			 * @param WP_Post $post The post object.
+			 * @param \WP_Post $post The post object.
 			 */
 			$actions = apply_filters( 'page_row_actions', $actions, $post );
 		} else {
@@ -609,7 +627,7 @@ class Results_List_Table extends \WP_List_Table {
 			 * @param array $actions An array of row action links. Defaults are
 			 *                         'Edit', 'Quick Edit', 'Restore, 'Trash',
 			 *                         'Delete Permanently', 'Preview', and 'View'.
-			 * @param WP_Post $post The post object.
+			 * @param \WP_Post $post The post object.
 			 */
 			$actions = apply_filters( 'post_row_actions', $actions, $post );
 		}

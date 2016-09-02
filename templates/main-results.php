@@ -1,3 +1,12 @@
+<?php
+/**
+ * Main results template.
+ *
+ * @package ES Admin
+ */
+
+?>
+
 <h3>
 	<?php
 	if ( ! empty( $_GET['s'] ) ) {
