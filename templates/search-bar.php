@@ -5,12 +5,9 @@
  * @package ES Admin
  */
 
-if ( empty( $_GET['s'] ) && ! $this->has_items() ) {
-	return;
-}
 ?>
 
-<form method="get">
+<form method="get" id="es-admin-search-bar">
 	<label class="screen-reader-text" for="es-admin-search-input"><?php esc_html_e( 'Search:', 'es-admin' ); ?></label>
 	<input type="search" id="es-admin-search-input" name="s" value="<?php _admin_search_query(); ?>" />
 	<?php if ( ! empty( $_REQUEST['page'] ) ) : ?>

@@ -25,6 +25,7 @@ class Controller {
 	 */
 	public function add_search_page() {
 		add_menu_page( __( 'Search', 'es-admin' ), __( 'Search', 'es-admin' ), 'edit_posts', 'es-admin-search', [ $this, 'search_page' ], 'dashicons-search', '1.1' );
+		add_action( 'admin_print_styles-toplevel_page_es-admin-search', [ $this, 'assets' ] );
 	}
 
 	/**
@@ -40,5 +41,12 @@ class Controller {
 			include( PATH . '/templates/main-results.php' );
 		}
 		include( PATH . '/templates/footer.php' );
+	}
+
+	/**
+	 * Load custom CSS and JS files for the page.
+	 */
+	public function assets() {
+		wp_enqueue_style( 'es-admin-css', URL . '/static/es-admin.css', [], '0.1' );
 	}
 }

@@ -36,7 +36,7 @@ class Results_List_Table extends \WP_List_Table {
 	 */
 	function get_columns() {
 		return [
-			'thumbnail' => _x( 'Thumbnail', 'column name', 'es-admin' ),
+			'thumbnail' => _x( 'Image', 'column name', 'es-admin' ),
 			'title'     => _x( 'Title', 'column name', 'es-admin' ),
 			'post_type' => __( 'Type', 'es-admin' ),
 			'author'    => _x( 'Author', 'column name', 'es-admin' ),
