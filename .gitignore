@@ -3,3 +3,4 @@ Thumbs.db
 /.idea
 wp-cli.local.yml
 node_modules/
+wpcom-helper.php

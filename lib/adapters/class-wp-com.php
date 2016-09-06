@@ -92,7 +92,7 @@ class WP_Com extends Adapter {
 	 */
 	public function query( $es_args ) {
 		if ( function_exists( 'es_api_search_index' ) ) {
-			return es_api_search_index( $es_args, 'es-wp-query' );
+			return es_api_search_index( $es_args, 'es-admin' );
 		}
 	}
 }

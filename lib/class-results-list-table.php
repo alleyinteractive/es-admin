@@ -425,7 +425,7 @@ class Results_List_Table extends \WP_List_Table {
 			$this->items = [];
 
 			$es_response = $es->query( $args );
-			if ( empty( $es_response['hits']['hits'] ) ) {
+			if ( is_wp_error( $es_response ) || empty( $es_response['hits']['hits'] ) ) {
 				$this->items = [];
 				return;
 			}
