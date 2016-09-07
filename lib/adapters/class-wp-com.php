@@ -111,7 +111,14 @@ class WP_Com extends Adapter {
 			 */
 			$es_args = apply_filters( 'es_admin_wp_com_es_args', $es_args );
 
-			return es_api_search_index( $es_args, 'es-admin' );
+			$response = es_api_search_index( $es_args, 'es-admin' );
+
+			// Normalize response (ES is hits.hits, wpcom is results.hits).
+			if ( isset( $es_response['results'] ) ) {
+				$es_response = [ 'hits' => $es_response['results'] ];
+			}
+
+			return $response;
 		}
 	}
 }
