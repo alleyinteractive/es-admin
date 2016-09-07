@@ -105,7 +105,7 @@ class ES {
 			$this->map_field( 'post_title.analyzed' ) . '^3',
 			$this->map_field( 'post_excerpt' ),
 			$this->map_field( 'post_content.analyzed' ),
-			$this->map_field( 'post_author.user_nicename' ),
+			$this->map_field( 'post_author.display_name' ),
 		] );
 
 		return $this->dsl_multi_match( $fields, $s, [

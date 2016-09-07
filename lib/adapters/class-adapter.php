@@ -18,6 +18,7 @@ abstract class Adapter {
 	 * 		post_id
 	 *      post_author
 	 *      	post_author.user_nicename
+	 *      	post_author.display_name
 	 * 		post_date
 	 * 			post_date.year
 	 * 			post_date.month

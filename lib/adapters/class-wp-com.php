@@ -17,6 +17,7 @@ class WP_Com extends Adapter {
 	 */
 	public function __construct() {
 		$this->field_map['post_author']                   = 'author_id';
+		$this->field_map['post_author.display_name']      = 'author';
 		$this->field_map['post_date']                     = 'date';
 		$this->field_map['post_date.year']                = 'date_token.year';
 		$this->field_map['post_date.month']               = 'date_token.month';
