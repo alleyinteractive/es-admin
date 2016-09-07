@@ -425,13 +425,19 @@ class Results_List_Table extends \WP_List_Table {
 			$this->items = [];
 
 			$es_response = $es->query( $args );
-			if ( is_wp_error( $es_response ) || empty( $es_response['hits']['hits'] ) ) {
+
+			// Normalize hits vs results (difference in ES versions)
+			if ( isset( $es_response['hits'] ) ) {
+				$es_response = [ 'results' => $es_response['hits'] ];
+			}
+
+			if ( is_wp_error( $es_response ) || empty( $es_response['results']['hits'] ) ) {
 				$this->items = [];
 				return;
 			}
 
 			$post_ids = array();
-			foreach ( $es_response['hits']['hits'] as $hit ) {
+			foreach ( $es_response['results']['hits'] as $hit ) {
 				if ( empty( $hit['fields'][ $es->map_field( 'post_id' ) ] ) ) {
 					continue;
 				}
@@ -457,9 +463,9 @@ class Results_List_Table extends \WP_List_Table {
 				'orderby' => 'post__in',
 			] );
 
-			if ( isset( $es_response['hits']['total'] ) ) {
+			if ( isset( $es_response['results']['total'] ) ) {
 				$this->set_pagination_args( [
-					'total_items' => absint( $es_response['hits']['total'] ),
+					'total_items' => absint( $es_response['results']['total'] ),
 					'per_page'    => $per_page,
 				] );
 			}
