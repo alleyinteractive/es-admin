@@ -92,6 +92,25 @@ class WP_Com extends Adapter {
 	 */
 	public function query( $es_args ) {
 		if ( function_exists( 'es_api_search_index' ) ) {
+			if ( ! empty( $es_args['blog_id'] ) ) {
+				$blog_id = absint( $es_args['blog_id'] );
+				unset( $es_args['blog_id'] );
+			} else {
+				$blog_id = get_current_blog_id();
+			}
+
+			$es_args['name'] = es_api_get_index_name_by_blog_id( $blog_id );
+			if ( is_wp_error( $es_args['name'] ) ) {
+				return $es_args['name'];
+			}
+
+			/**
+			 * Filter the ES args once more, after the site name has been set.
+			 *
+			 * @var array Elasticsearch DSL query as a PHP array.
+			 */
+			$es_args = apply_filters( 'es_admin_wp_com_es_args', $es_args );
+
 			return es_api_search_index( $es_args, 'es-admin' );
 		}
 	}
