@@ -426,7 +426,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			$es_response = $es->query( $args );
 
-			// Normalize hits vs results (difference in ES versions)
+			// Normalize hits vs results (difference in ES versions).
 			if ( isset( $es_response['hits'] ) ) {
 				$es_response = [ 'results' => $es_response['hits'] ];
 			}
