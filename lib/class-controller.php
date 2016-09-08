@@ -49,5 +49,6 @@ class Controller {
 	 */
 	public function assets() {
 		wp_enqueue_style( 'es-admin-css', URL . '/static/es-admin.css', [ 'buttons' ], '0.1' );
+		wp_enqueue_script( 'es-admin-js', URL . '/static/es-admin.js', [ 'jquery' ], '0.1' );
 	}
 }
