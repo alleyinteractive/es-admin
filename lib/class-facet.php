@@ -11,24 +11,63 @@ namespace ES_Admin;
  * Elasticsearch facet/aggregation
  */
 class Facet {
+	/**
+	 * The label for this facet, as provided by ES.
+	 *
+	 * @var string
+	 */
 	protected $label;
 
+	/**
+	 * This facet's buckets (results).
+	 *
+	 * @var array
+	 */
 	protected $buckets;
 
+	/**
+	 * The label for this facet section.
+	 *
+	 * @var string
+	 */
 	protected $title;
 
+	/**
+	 * The parsed type from the facet label.
+	 *
+	 * @var string
+	 */
 	protected $type;
 
+	/**
+	 * The parsed subtype from the facet label, if applicable.
+	 *
+	 * @var string
+	 */
 	protected $subtype;
 
+	/**
+	 * The query var this facet.
+	 *
+	 * @var string
+	 */
 	protected $query_var;
 
+	/**
+	 * Build this facet object.
+	 *
+	 * @param string $label   The label as provided by ES.
+	 * @param array $buckets  The buckets/results for the facet.
+	 */
 	public function __construct( $label, $buckets ) {
 		$this->label = $label;
 		$this->buckets = $buckets;
 		$this->parse_type();
 	}
 
+	/**
+	 * Parse the type (and subtype) for this facet.
+	 */
 	protected function parse_type() {
 		if ( 'taxonomy_' === substr( $this->label, 0, 9 ) ) {
 			$this->type = 'taxonomy';
@@ -38,14 +77,29 @@ class Facet {
 		}
 	}
 
+	/**
+	 * Get the field (checkbox) name for this facet.
+	 *
+	 * @return string
+	 */
 	public function field_name() {
 		return sprintf( 'facets[%s][]', $this->query_var );
 	}
 
+	/**
+	 * Get the buckets for this facet.
+	 *
+	 * @return array
+	 */
 	public function buckets() {
 		return $this->buckets;
 	}
 
+	/**
+	 * Get the title for this facet section.
+	 *
+	 * @return string
+	 */
 	public function title() {
 		if ( ! isset( $this->title ) ) {
 			$this->title = apply_filters( 'es_admin_facet_title', null, $this->label, $this->type, $this->subtype );
@@ -82,6 +136,12 @@ class Facet {
 		return $this->title;
 	}
 
+	/**
+	 * Get the label for an individual bucket.
+	 *
+	 * @param  array $bucket Bucket from ES.
+	 * @return string
+	 */
 	public function get_label_for_bucket( $bucket ) {
 		// Allow theme/other plugins to override this
 		$label = apply_filters( 'es_admin_facet_bucket_label', null, $bucket, $this->label, $this->type, $this->subtype );
@@ -126,6 +186,12 @@ class Facet {
 		}
 	}
 
+	/**
+	 * Get the formatted field value.
+	 *
+	 * @param  mixed $value Raw value.
+	 * @return mixed Formatted value.
+	 */
 	public function field_value( $value ) {
 		if ( 'post_date' === $this->type ) {
 			return absint( $value ) / 1000;
@@ -133,6 +199,12 @@ class Facet {
 		return $value;
 	}
 
+	/**
+	 * Checked helper for the input checkbox. Wraps `checked()` and checks $_GET
+	 * to keep the template clean.
+	 *
+	 * @param  mixed $value Current bucket value.
+	 */
 	public function checked( $value ) {
 		if ( 'post_date' === $this->type ) {
 			$value = absint( $value ) / 1000;

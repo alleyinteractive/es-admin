@@ -35,13 +35,6 @@ class ES {
 	protected $main_search;
 
 	/**
-	 * Map the logic type for facets (and/or).
-	 *
-	 * @var array {facet} => 'and' or 'or'.
-	 */
-	protected $facet_types;
-
-	/**
 	 * Setup the singleton.
 	 *
 	 * @throws \Exception If the adapter is invalid.
@@ -55,8 +48,6 @@ class ES {
 		if ( ! ( $this->adapter instanceof Adapters\Adapter ) ) {
 			throw new \Exception( __( 'Invalid Elasticsearch Adapter', 'es-admin' ) );
 		}
-
-		$this->set_facet_types();
 	}
 
 	/**
@@ -110,6 +101,11 @@ class ES {
 		}
 	}
 
+	/**
+	 * Set the main search for this page, like core's main query.
+	 *
+	 * @param Search $search Search object to consider the main search.
+	 */
 	public function set_main_search( $search ) {
 		if ( $search instanceof Search ) {
 			$this->main_search = $search;
@@ -118,21 +114,16 @@ class ES {
 		}
 	}
 
+	/**
+	 * Get the main search for this screen.
+	 *
+	 * @return Search
+	 */
 	public function main_search() {
 		if ( ! $this->main_search ) {
 			$this->set_main_search( null );
 		}
 
 		return $this->main_search;
-	}
-
-	protected function set_facet_types() {
-		$this->facet_types = apply_filters( 'es_admin_facet_types', [
-			'author'            => 'or',
-			'post_type'         => 'or',
-			'post_date'         => 'and',
-			'taxonomy_category' => 'and',
-			'taxonomy_post_tag' => 'and',
-		] );
 	}
 }

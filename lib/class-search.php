@@ -8,19 +8,49 @@
 namespace ES_Admin;
 
 /**
- * Elasticsearch facet/aggregation
+ * Elasticsearch query.
  */
 class Search {
+	/**
+	 * Elasticsearch DSL arguments.
+	 *
+	 * @var array
+	 */
 	protected $es_args = [];
 
+	/**
+	 * Raw results from ES.
+	 *
+	 * @var array
+	 */
 	protected $results = [];
 
+	/**
+	 * Hits (search results) from ES.
+	 *
+	 * @var array
+	 */
 	protected $hits = [];
 
+	/**
+	 * Facets from ES.
+	 *
+	 * @var array
+	 */
 	protected $facets = [];
 
+	/**
+	 * Search results total.
+	 *
+	 * @var int
+	 */
 	protected $total;
 
+	/**
+	 * Build the search.
+	 *
+	 * @param array $es_args Elasticsearch DSL.
+	 */
 	public function __construct( $es_args = null ) {
 		if ( $es_args ) {
 			$this->es_args = $es_args;
@@ -28,6 +58,9 @@ class Search {
 		}
 	}
 
+	/**
+	 * Run the query.
+	 */
 	protected function query() {
 		$this->results = ES::instance()->query( $this->es_args );
 		$this->results = apply_filters( 'es_admin_results', $this->results );
@@ -36,6 +69,9 @@ class Search {
 		$this->parse_facets();
 	}
 
+	/**
+	 * Pull the hits out of the ES response.
+	 */
 	protected function parse_hits() {
 		$this->hits = apply_filters( 'es_admin_parse_hits', [] );
 		if ( empty( $this->hits ) ) {
@@ -45,6 +81,9 @@ class Search {
 		}
 	}
 
+	/**
+	 * Pull the total out of the ES response.
+	 */
 	protected function parse_total() {
 		$this->total = apply_filters( 'es_admin_parse_total', null );
 		if ( ! isset( $this->total ) ) {
@@ -55,6 +94,9 @@ class Search {
 		}
 	}
 
+	/**
+	 * Pull the facets out of the ES response.
+	 */
 	protected function parse_facets() {
 		$this->facets = apply_filters( 'es_admin_parse_facets', [] );
 		if ( empty( $this->facets ) ) {
@@ -66,22 +108,47 @@ class Search {
 		}
 	}
 
+	/**
+	 * Does this search have any results?
+	 *
+	 * @return boolean
+	 */
 	public function has_hits() {
 		return ! empty( $this->hits );
 	}
 
+	/**
+	 * Get the search results.
+	 *
+	 * @return array
+	 */
 	public function hits() {
 		return $this->hits;
 	}
 
+	/**
+	 * Does this search have any facets?
+	 *
+	 * @return boolean
+	 */
 	public function has_facets() {
 		return ! empty( $this->facets );
 	}
 
+	/**
+	 * Get the facets.
+	 *
+	 * @return array
+	 */
 	public function facets() {
 		return $this->facets;
 	}
 
+	/**
+	 * Get the total.
+	 *
+	 * @return int
+	 */
 	public function total() {
 		return $this->total;
 	}
