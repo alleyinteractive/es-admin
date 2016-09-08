@@ -87,7 +87,7 @@ class Search {
 	protected function parse_total() {
 		$this->total = apply_filters( 'es_admin_parse_total', null );
 		if ( ! isset( $this->total ) ) {
-			// Using isset because 0 is empty but valid
+			// Using isset because 0 is empty but valid.
 			if ( isset( $this->results['hits']['total'] ) ) {
 				$this->total = absint( $this->results['hits']['total'] );
 			}

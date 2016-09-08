@@ -438,7 +438,7 @@ class Results_List_Table extends \WP_List_Table {
 			foreach ( $facets as $facet_type ) {
 				$aggs = array_merge( $aggs, $facet_type->request() );
 				if ( ! empty( $_GET['facets'][ $facet_type->query_var() ] ) ) {
-					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] );
+					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // WPCS: sanitization ok.
 					$args['query']['filtered']['filter']['and'][] = $facet_type->filter( $values );
 				}
 			}
@@ -448,7 +448,7 @@ class Results_List_Table extends \WP_List_Table {
 				$args['aggs'] = $aggs;
 			}
 
-			// Run the search
+			// Run the search.
 			$this->items = [];
 			$search = new Search( $args );
 			$es->set_main_search( $search );

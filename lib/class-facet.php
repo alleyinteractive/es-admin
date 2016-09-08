@@ -57,7 +57,7 @@ class Facet {
 	 * Build this facet object.
 	 *
 	 * @param string $label   The label as provided by ES.
-	 * @param array $buckets  The buckets/results for the facet.
+	 * @param array  $buckets The buckets/results for the facet.
 	 */
 	public function __construct( $label, $buckets ) {
 		$this->label = $label;
@@ -143,7 +143,6 @@ class Facet {
 	 * @return string
 	 */
 	public function get_label_for_bucket( $bucket ) {
-		// Allow theme/other plugins to override this
 		$label = apply_filters( 'es_admin_facet_bucket_label', null, $bucket, $this->label, $this->type, $this->subtype );
 		if ( null !== $label ) {
 			return $label;
@@ -209,7 +208,7 @@ class Facet {
 		if ( 'post_date' === $this->type ) {
 			$value = absint( $value ) / 1000;
 		}
-		$values = ! empty( $_GET['facets'][ $this->query_var ] ) ? (array) $_GET['facets'][ $this->query_var ] : [];
+		$values = ! empty( $_GET['facets'][ $this->query_var ] ) ? (array) $_GET['facets'][ $this->query_var ] : []; // WPCS: sanitization ok.
 		checked( in_array( $value, $values ) );
 	}
 }
