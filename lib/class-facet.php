@@ -96,6 +96,15 @@ class Facet {
 	}
 
 	/**
+	 * Does this facet have any results?
+	 *
+	 * @return boolean
+	 */
+	public function has_buckets() {
+		return ! empty( $this->buckets );
+	}
+
+	/**
 	 * Get the title for this facet section.
 	 *
 	 * @return string
