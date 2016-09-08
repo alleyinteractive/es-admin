@@ -5,6 +5,7 @@
  * @package ES Admin
  */
 
+namespace ES_Admin;
 ?>
 
 <form method="get" id="es-admin-search-bar">

@@ -38,6 +38,7 @@ class Controller {
 		include( PATH . '/templates/header.php' );
 		include( PATH . '/templates/search-bar.php' );
 		if ( ! empty( $_GET['s'] ) ) {
+			include( PATH . '/templates/main-facets.php' );
 			include( PATH . '/templates/main-results.php' );
 		}
 		include( PATH . '/templates/footer.php' );
@@ -47,6 +48,6 @@ class Controller {
 	 * Load custom CSS and JS files for the page.
 	 */
 	public function assets() {
-		wp_enqueue_style( 'es-admin-css', URL . '/static/es-admin.css', [], '0.1' );
+		wp_enqueue_style( 'es-admin-css', URL . '/static/es-admin.css', [ 'buttons' ], '0.1' );
 	}
 }
