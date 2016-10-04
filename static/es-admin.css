@@ -17,3 +17,26 @@
 #es-admin-search-results #post_type {
 	width: 10%;
 }
+
+#es-admin-search-results, #es-admin-facets {
+	display: table-cell;
+	vertical-align: top;
+}
+
+#es-admin-facets {
+	width: 250px;
+	padding-right: 15px;
+}
+
+#es-admin-facets h2 {
+	margin-top: 50px;
+}
+
+#es-admin-facets h3 {
+	margin-bottom: 0.5em;
+}
+
+#es-admin-facets ol {
+	list-style: none;
+	margin: 0 0 1em;
+}

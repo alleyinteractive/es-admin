@@ -116,7 +116,8 @@ class WP_Com extends Adapter {
 
 			// Normalize response (ES is hits.hits, wpcom is results.hits).
 			if ( isset( $response['results'] ) ) {
-				$response = [ 'hits' => $response['results'] ];
+				$response['hits'] = $response['results'];
+				unset( $response['results'] );
 			}
 
 			return $response;

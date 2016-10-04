@@ -21,6 +21,20 @@ class ES {
 	protected $adapter;
 
 	/**
+	 * Store the facets from the last search.
+	 *
+	 * @var array Facet objects
+	 */
+	protected $facets;
+
+	/**
+	 * Store the main (shared) search object.
+	 *
+	 * @var Search
+	 */
+	protected $main_search;
+
+	/**
 	 * Setup the singleton.
 	 *
 	 * @throws \Exception If the adapter is invalid.
@@ -88,113 +102,28 @@ class ES {
 	}
 
 	/**
-	 * Given a search term, return the query DSL for the search.
+	 * Set the main search for this page, like core's main query.
 	 *
-	 * @param  string $s Search term.
-	 * @return array DSL fragment.
+	 * @param Search $search Search object to consider the main search.
 	 */
-	public function search_query( $s ) {
-		/**
-		 * Filter the Elasticsearch fields to search. The fields should already
-		 * be mapped (use `ES::map_field()`, `ES::map_tax_field()`, or
-		 * `ES::map_meta_field()` to map a field).
-		 *
-		 * @var array
-		 */
-		$fields = apply_filters( 'es_admin_searchable_fields', [
-			$this->map_field( 'post_title.analyzed' ) . '^3',
-			$this->map_field( 'post_excerpt' ),
-			$this->map_field( 'post_content.analyzed' ),
-			$this->map_field( 'post_author.display_name' ),
-		] );
-
-		return $this->dsl_multi_match( $fields, $s, [
-			'operator' => 'and',
-			'type'     => 'cross_fields',
-		] );
-	}
-
-	/**
-	 * Build a term or terms DSL fragment.
-	 *
-	 * @param  string $field  ES field.
-	 * @param  mixed  $values Value(s) to query/filter.
-	 * @param  array  $args Optional. Additional DSL arguments.
-	 * @return array DSL fragment.
-	 */
-	public static function dsl_terms( $field, $values, $args = array() ) {
-		$type = is_array( $values ) ? 'terms' : 'term';
-		return array( $type => array_merge( array( $field => $values ), $args ) );
-	}
-
-	/**
-	 * Build a range DSL fragment.
-	 *
-	 * @param  string $field  ES field.
-	 * @param  array  $args Optional. Additional DSL arguments.
-	 * @return array  DSL fragment.
-	 */
-	public static function dsl_range( $field, $args ) {
-		return array( 'range' => array( $field => $args ) );
-	}
-
-	/**
-	 * Build an exists DSL fragment.
-	 *
-	 * @param  string $field  ES field.
-	 * @return array DSL fragment.
-	 */
-	public static function dsl_exists( $field ) {
-		return array( 'exists' => array( 'field' => $field ) );
-	}
-
-	/**
-	 * Build a missing DSL fragment.
-	 *
-	 * @param  string $field  ES field.
-	 * @param  array  $args Optional. Additional DSL arguments.
-	 * @return array DSL fragment.
-	 */
-	public static function dsl_missing( $field, $args = array() ) {
-		return array( 'missing' => array_merge( array( 'field' => $field ), $args ) );
-	}
-
-	/**
-	 * Build a match DSL fragment.
-	 *
-	 * @param  string $field  ES field.
-	 * @param  string $value  Value to match against.
-	 * @param  array  $args Optional. Additional DSL arguments.
-	 * @return array DSL fragment.
-	 */
-	public static function dsl_match( $field, $value, $args = array() ) {
-		return array( 'match' => array_merge( array( $field => $value ), $args ) );
-	}
-
-	/**
-	 * Build a multi_match DSL fragment.
-	 *
-	 * @param  array  $fields ES fields.
-	 * @param  string $query Search phrase to query.
-	 * @param  array  $args Optional. Additional DSL arguments.
-	 * @return array DSL fragment.
-	 */
-	public static function dsl_multi_match( $fields, $query, $args = array() ) {
-		return array( 'multi_match' => array_merge( array( 'query' => $query, 'fields' => (array) $fields ), $args ) );
-	}
-
-	/**
-	 * Build a "must" bool fragment for an array of terms.
-	 *
-	 * @param  string $field  ES field.
-	 * @param  array  $values  Values to match.
-	 * @return array DSL fragment.
-	 */
-	public static function dsl_all_terms( $field, $values ) {
-		$queries = array();
-		foreach ( $values as $value ) {
-			$queries[] = array( 'term' => array( $field => $value ) );
+	public function set_main_search( $search ) {
+		if ( $search instanceof Search ) {
+			$this->main_search = $search;
+		} else {
+			$this->main_search = new Search;
 		}
-		return array( 'bool' => array( 'must' => $queries ) );
+	}
+
+	/**
+	 * Get the main search for this screen.
+	 *
+	 * @return Search
+	 */
+	public function main_search() {
+		if ( ! $this->main_search ) {
+			$this->set_main_search( null );
+		}
+
+		return $this->main_search;
 	}
 }

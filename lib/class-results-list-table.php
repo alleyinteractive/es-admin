@@ -371,15 +371,26 @@ class Results_List_Table extends \WP_List_Table {
 			$post_types = array_values( get_post_types( [ 'public' => true ] ) );
 			$post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
 
+			$facets = apply_filters( 'es_admin_configured_facets', [
+				new Facets\Post_Type(),
+				new Facets\Category(),
+				new Facets\Tag(),
+				new Facets\Post_Date(),
+			] );
+
 			$filters = [
-				$es->dsl_terms( $es->map_field( 'post_type' ), $post_types ),
-				[ 'not' => $es->dsl_terms( $es->map_field( 'post_status' ), $post_statuses ) ],
+				DSL::terms( $es->map_field( 'post_type' ), $post_types ),
+				[ 'not' => DSL::terms( $es->map_field( 'post_status' ), $post_statuses ) ],
 			];
 
 			// Build the ES args.
 			$args = [
-				'filter' => [
-					'and' => $filters,
+				'query' => [
+					'filtered' => [
+						'filter' => [
+							'and' => $filters,
+						],
+					],
 				],
 				'fields' => [
 					'post_id',
@@ -390,7 +401,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Build the search query.
 			if ( ! empty( $_GET['s'] ) ) {
-				$args['query'] = $es->search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
+				$args['query']['filtered']['query'] = DSL::search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
 			}
 
 			// Setup pagination.
@@ -422,16 +433,33 @@ class Results_List_Table extends \WP_List_Table {
 				];
 			}
 
-			$this->items = [];
+			// Build the facets and add filters from any facets in the request.
+			$aggs = [];
+			foreach ( $facets as $facet_type ) {
+				$aggs = array_merge( $aggs, $facet_type->request() );
+				if ( ! empty( $_GET['facets'][ $facet_type->query_var() ] ) ) {
+					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // WPCS: sanitization ok.
+					$args['query']['filtered']['filter']['and'][] = $facet_type->filter( $values );
+				}
+			}
 
-			$es_response = $es->query( $args );
-			if ( empty( $es_response['hits']['hits'] ) ) {
+			$aggs = apply_filters( 'es_admin_facets_query', $aggs );
+			if ( ! empty( $aggs ) ) {
+				$args['aggs'] = $aggs;
+			}
+
+			// Run the search.
+			$this->items = [];
+			$search = new Search( $args );
+			$es->set_main_search( $search );
+
+			if ( ! $search->has_hits() ) {
 				$this->items = [];
 				return;
 			}
 
 			$post_ids = array();
-			foreach ( $es_response['hits']['hits'] as $hit ) {
+			foreach ( $search->hits() as $hit ) {
 				if ( empty( $hit['fields'][ $es->map_field( 'post_id' ) ] ) ) {
 					continue;
 				}
@@ -457,12 +485,10 @@ class Results_List_Table extends \WP_List_Table {
 				'orderby' => 'post__in',
 			] );
 
-			if ( isset( $es_response['hits']['total'] ) ) {
-				$this->set_pagination_args( [
-					'total_items' => absint( $es_response['hits']['total'] ),
-					'per_page'    => $per_page,
-				] );
-			}
+			$this->set_pagination_args( [
+				'total_items' => $search->total(),
+				'per_page'    => $per_page,
+			] );
 		}
 	}
 
