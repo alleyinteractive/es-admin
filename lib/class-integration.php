@@ -52,7 +52,7 @@ class Integration {
 	/**
 	 * Use Elasticsearch in main queries if this is a search.
 	 *
-	 * @param  \WP_Query &$query \WP_Query object, passed by reference.
+	 * @param  \WP_Query $query \WP_Query object, passed by reference.
 	 */
 	public function main_search( &$query ) {
 		if ( $query->is_main_query() && $query->is_search() ) {

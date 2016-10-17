@@ -86,7 +86,7 @@ class Settings {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'es-admin' ) );
 		}
 
-		if ( ! isset( $_POST['es_admin_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['es_admin_nonce'] ), 'es_admin_settings' ) ) {
+		if ( ! isset( $_POST['es_admin_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['es_admin_nonce'] ), 'es_admin_settings' ) ) { // wpcs: sanitization ok.
 			wp_die( esc_html__( 'You are not authorized to perform that action', 'es-admin' ) );
 		}
 

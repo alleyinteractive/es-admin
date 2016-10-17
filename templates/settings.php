@@ -1,3 +1,11 @@
+<?php
+/**
+ * Admin settings screen.
+ *
+ * @package ES Admin
+ */
+
+?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Admin Search Settings', 'es-admin' ); ?></h1>
 
