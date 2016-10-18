@@ -64,7 +64,7 @@ class Integration {
 	/**
 	 * Filter the fields ES_WP_Query searches.
 	 *
-	 * @param  array $fields Mapped ES fields. {@see \ES_WP_Query::$es_map}.
+	 * @param  array        $fields Mapped ES fields. {@see \ES_WP_Query::$es_map}.
 	 * @param  \ES_WP_Query $query Optional. ES_WP_Query object for field
 	 *                             mapping. Older versions of ES_WP_Query don't
 	 *                             pass this param, so it's optional.
