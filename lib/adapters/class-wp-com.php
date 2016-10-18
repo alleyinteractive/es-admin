@@ -114,10 +114,15 @@ class WP_Com extends Adapter {
 
 			$response = es_api_search_index( $es_args, 'es-admin' );
 
-			// Normalize response (ES is hits.hits, wpcom is results.hits).
+			// Normalize response (ES is hits.hits, wpcom is results.hits; ES is
+			// aggregations, wpcom is results.aggregations).
 			if ( isset( $response['results'] ) ) {
 				$response['hits'] = $response['results'];
 				unset( $response['results'] );
+				if ( isset( $response['hits']['aggregations'] ) ) {
+					$response['aggregations'] = $response['hits']['aggregations'];
+					unset( $response['hits']['aggregations'] );
+				}
 			}
 
 			return $response;
