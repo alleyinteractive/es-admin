@@ -56,6 +56,6 @@ if ( is_admin() ) {
 	// Load the settings class.
 	add_action( 'after_setup_theme', [ '\ES_Admin\Settings', 'instance' ] );
 
-	// Load the settings class.
+	// Load the integration class.
 	add_action( 'after_setup_theme', [ '\ES_Admin\Integration', 'instance' ] );
 }

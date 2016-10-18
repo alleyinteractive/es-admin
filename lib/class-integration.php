@@ -65,13 +65,18 @@ class Integration {
 	 * Filter the fields ES_WP_Query searches.
 	 *
 	 * @param  array $fields Mapped ES fields. {@see \ES_WP_Query::$es_map}.
+	 * @param  \ES_WP_Query $query Optional. ES_WP_Query object for field
+	 *                             mapping. Older versions of ES_WP_Query don't
+	 *                             pass this param, so it's optional.
 	 * @return array
 	 */
-	public function query_attachments_searchable_fields( $fields ) {
-		// Instantiate an empty query to access the field map in ES_WP_Query.
-		$query = new \ES_WP_Query;
+	public function query_attachments_searchable_fields( $fields, $query = null ) {
+		if ( ! $query ) {
+			// Instantiate an empty query to access the field map in ES_WP_Query.
+			$query = new \ES_WP_Query;
+		}
 		$fields[] = $query->es_map( 'post_excerpt' );
 		$fields[] = $query->meta_map( '_wp_attachment_image_alt', 'analyzed' );
-		return $fields;
+		return apply_filters( 'es_admin_query_attachments_searchable_fields', $fields, $query );
 	}
 }
