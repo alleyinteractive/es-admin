@@ -37,17 +37,25 @@
 
 namespace ES_Admin;
 
-define( __NAMESPACE__ . '\PATH', __DIR__ );
-define( __NAMESPACE__ . '\URL', trailingslashit( plugins_url( '', __FILE__ ) ) );
+if ( is_admin() ) {
+	define( __NAMESPACE__ . '\PATH', __DIR__ );
+	define( __NAMESPACE__ . '\URL', trailingslashit( plugins_url( '', __FILE__ ) ) );
 
-// Custom autoloader.
-require_once( PATH . '/lib/autoload.php' );
+	// Custom autoloader.
+	require_once( PATH . '/lib/autoload.php' );
 
-// Singleton trait.
-require_once( PATH . '/lib/trait-singleton.php' );
+	// Singleton trait.
+	require_once( PATH . '/lib/trait-singleton.php' );
 
-// Assorted Functions.
-require_once( PATH . '/lib/functions.php' );
+	// Assorted Functions.
+	require_once( PATH . '/lib/functions.php' );
 
-// Load the main controller class.
-add_action( 'after_setup_theme', [ '\ES_Admin\Controller', 'instance' ] );
+	// Load the main controller class.
+	add_action( 'after_setup_theme', [ '\ES_Admin\Controller', 'instance' ] );
+
+	// Load the settings class.
+	add_action( 'after_setup_theme', [ '\ES_Admin\Settings', 'instance' ] );
+
+	// Load the integration class.
+	add_action( 'after_setup_theme', [ '\ES_Admin\Integration', 'instance' ] );
+}

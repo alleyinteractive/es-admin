@@ -33,6 +33,7 @@ class DSL {
 			$es->map_field( 'post_excerpt' ),
 			$es->map_field( 'post_content.analyzed' ),
 			$es->map_field( 'post_author.display_name' ),
+			$es->map_meta_field( '_wp_attachment_image_alt', 'analyzed' ),
 		] );
 
 		return DSL::multi_match( $fields, $s, [
