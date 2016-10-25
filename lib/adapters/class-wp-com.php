@@ -77,12 +77,15 @@ class WP_Com extends Adapter {
 		$this->field_map['term_id']                       = 'taxonomy.%s.term_id';
 		$this->field_map['term_slug']                     = 'taxonomy.%s.slug';
 		$this->field_map['term_name']                     = 'taxonomy.%s.name.raw_lc';
+		$this->field_map['term_name.analyzed']            = 'taxonomy.%s.name';
 		$this->field_map['category_id']                   = 'category.term_id';
 		$this->field_map['category_slug']                 = 'category.slug';
-		$this->field_map['category_name']                 = 'category.name.raw';
+		$this->field_map['category_name']                 = 'category.name.raw_lc';
+		$this->field_map['category_name.analyzed']        = 'category.name';
 		$this->field_map['tag_id']                        = 'tag.term_id';
 		$this->field_map['tag_slug']                      = 'tag.slug';
-		$this->field_map['tag_name']                      = 'tag.name.raw';
+		$this->field_map['tag_name']                      = 'tag.name.raw_lc';
+		$this->field_map['tag_name.analyzed']             = 'tag.name';
 	}
 
 	/**
