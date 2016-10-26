@@ -32,10 +32,10 @@ class SearchPress extends Adapter {
 		$this->field_map['post_meta.unsigned']     = 'post_meta.%s.long';
 		$this->field_map['term_name']              = 'terms.%s.name.raw';
 		$this->field_map['term_name.analyzed']     = 'terms.%s.name';
-		$this->field_map['category_name']          = 'terms.%s.name.raw';
-		$this->field_map['category_name.analyzed'] = 'terms.%s.name';
-		$this->field_map['tag_name']               = 'terms.%s.name.raw';
-		$this->field_map['tag_name.analyzed']      = 'terms.%s.name';
+		$this->field_map['category_name']          = 'terms.category.name.raw';
+		$this->field_map['category_name.analyzed'] = 'terms.category.name';
+		$this->field_map['tag_name']               = 'terms.post_tag.name.raw';
+		$this->field_map['tag_name.analyzed']      = 'terms.post_tag.name';
 	}
 
 	/**
