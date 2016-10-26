@@ -42,6 +42,18 @@ class Integration {
 		// Only use ES Admin if this is a search.
 		if ( ! empty( $args['s'] ) ) {
 			$args['es'] = true;
+
+			// Add "publish" to the post status list if we're querying for inherit
+			// and publish isn't already set.
+			if (
+				! empty( $args['post_status'] )
+				&& is_string( $args['post_status'] )
+				&& false === strpos( $args['post_status'], 'publish' )
+				&& false !== strpos( $args['post_status'], 'inherit' )
+			) {
+				$args['post_status'] .= ',publish';
+			}
+
 			$args = apply_filters( 'es_admin_integration_query_attachments', $args );
 			add_filter( 'es_searchable_fields', [ $this, 'query_attachments_searchable_fields' ], 10, 2 );
 		}
