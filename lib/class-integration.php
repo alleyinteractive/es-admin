@@ -47,6 +47,11 @@ class Integration {
 				$args['post_status'] = $this->attachments_post_status( $args['post_status'] );
 			}
 
+			// Temporary fix; currently, VIP does not index post_mime_type.
+			if ( isset( $args['post_mime_type'] ) && defined( 'WPCOM_IS_VIP_ENV' ) && WPCOM_IS_VIP_ENV ) {
+				unset( $args['post_mime_type'] );
+			}
+
 			$args = apply_filters( 'es_admin_integration_query_attachments', $args );
 			add_filter( 'es_searchable_fields', [ $this, 'query_attachments_searchable_fields' ], 10, 2 );
 		}
