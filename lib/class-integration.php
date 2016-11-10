@@ -43,15 +43,8 @@ class Integration {
 		if ( ! empty( $args['s'] ) ) {
 			$args['es'] = true;
 
-			// Add "publish" to the post status list if we're querying for inherit
-			// and publish isn't already set.
-			if (
-				! empty( $args['post_status'] )
-				&& is_string( $args['post_status'] )
-				&& false === strpos( $args['post_status'], 'publish' )
-				&& false !== strpos( $args['post_status'], 'inherit' )
-			) {
-				$args['post_status'] .= ',publish';
+			if ( ! empty( $args['post_status'] ) ) {
+				$args['post_status'] = $this->attachments_post_status( $args['post_status'] );
 			}
 
 			$args = apply_filters( 'es_admin_integration_query_attachments', $args );
@@ -69,6 +62,14 @@ class Integration {
 	public function main_search( &$query ) {
 		if ( $query->is_main_query() && $query->is_search() ) {
 			$query->set( 'es', true );
+
+			// Maybe add 'public' to the post status list.
+			if ( in_array( 'attachment', (array) $query->get( 'post_type' ) ) ) {
+				$post_status = $query->get( 'post_status' );
+				if ( ! empty( $post_status ) ) {
+					$query->set( 'post_status', $this->attachments_post_status( $post_status ) );
+				}
+			}
 			do_action_ref_array( 'es_admin_integration_pre_get_posts', [ &$query ] );
 		}
 	}
@@ -84,5 +85,24 @@ class Integration {
 		$fields[] = $query->es_map( 'post_excerpt' );
 		$fields[] = $query->meta_map( '_wp_attachment_image_alt', 'analyzed' );
 		return apply_filters( 'es_admin_query_attachments_searchable_fields', $fields, $query );
+	}
+
+	/**
+	 * Add "publish" to the post status list if we're querying for inherit and
+	 * publish isn't already set.
+	 *
+	 * @param  string $status Post status string.
+	 * @return string
+	 */
+	protected function attachments_post_status( $status ) {
+		if (
+			is_string( $status )
+			&& false === strpos( $status, 'publish' )
+			&& false !== strpos( $status, 'inherit' )
+		) {
+			$status .= ',publish';
+		}
+
+		return $status;
 	}
 }
