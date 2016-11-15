@@ -20,6 +20,7 @@ class Integration {
 		if ( $this->is_active() ) {
 			add_action( 'ajax_query_attachments_args', [ $this, 'query_attachments' ] );
 			add_filter( 'pre_get_posts', [ $this, 'main_search' ] );
+			add_filter( 'wp_link_query_args', [ $this, 'wp_link_query_args' ], 20 );
 		}
 	}
 
@@ -109,5 +110,21 @@ class Integration {
 		}
 
 		return $status;
+	}
+
+	/**
+	 * Filter the query args used by the tinymce plugin `wplink` to search for
+	 * posts. This will offload the query to Elasticsearch if it is a keyword
+	 * search.
+	 *
+	 * @param  array $args WP_Query args.
+	 * @return array
+	 */
+	public function wp_link_query_args( $args ) {
+		if ( ! empty( $args['s'] ) && ! array_key_exists( $args, 'es' ) ) {
+			$args['es'] = true;
+		}
+
+		return $args;
 	}
 }
