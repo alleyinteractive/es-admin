@@ -93,19 +93,22 @@ class Integration {
 	}
 
 	/**
-	 * Add "publish" to the post status list if we're querying for inherit and
-	 * publish isn't already set.
+	 * Potentially alter the post_status when attachments are queried.
 	 *
-	 * @param  string $status Post status string.
-	 * @return string
+	 * @param  string|array $status Post status.
+	 * @return string|array
 	 */
 	protected function attachments_post_status( $status ) {
-		if (
-			is_string( $status )
-			&& false === strpos( $status, 'publish' )
-			&& false !== strpos( $status, 'inherit' )
-		) {
-			$status .= ',publish';
+		/**
+		 * This filter allows developers to optionally ignore the post_status
+		 * field on attachments. Depending on how content is built to be
+		 * indexed, the post_status may be the parent post's post_status, which
+		 * would then be impossible to search against.
+		 *
+		 * @param bool $ignore_attachment_post_status Defaults to false.
+		 */
+		if ( apply_filters( 'es_admin_ignore_attachment_post_status', false ) ) {
+			return 'any';
 		}
 
 		return $status;
