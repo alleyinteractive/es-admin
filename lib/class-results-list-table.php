@@ -52,12 +52,8 @@ class Results_List_Table extends \WP_List_Table {
 	 */
 	protected function get_sortable_columns() {
 		$columns = [
-			'date' => 'date',
+			'date' => [ 'date', true ],
 		];
-
-		if ( empty( $_GET['s'] ) ) {
-			$columns['date'] = [ 'date', true ];
-		}
 
 		return $columns;
 	}
@@ -415,12 +411,20 @@ class Results_List_Table extends \WP_List_Table {
 			if ( ! empty( $_GET['orderby'] ) ) {
 				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc'; // WPCS: sanitization ok.
 				switch ( $_GET['orderby'] ) {
-					case 'date' :
+					case 'relevance' :
+						$orderby = '_score';
+						break;
+
+					default :
 						$orderby = 'post_date';
 						break;
 				}
+
+				// Map the key if it's not score.
+				$key = '_score' === $orderby ? $orderby : $es->map_field( $orderby );
+
 				$args['sort'] = [
-					[ $es->map_field( $orderby ) => $order ],
+					[ $key => $order ],
 				];
 			} elseif ( ! empty( $_GET['s'] ) ) {
 				$args['sort'] = [
@@ -432,6 +436,7 @@ class Results_List_Table extends \WP_List_Table {
 					[ $es->map_field( 'post_date' ) => 'desc' ],
 				];
 			}
+			$args['sort'] = apply_filters( 'es_admin_table_sort', $args['sort'], $es, $args );
 
 			// Build the facets and add filters from any facets in the request.
 			$aggs = [];
