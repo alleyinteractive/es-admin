@@ -6,6 +6,7 @@
  */
 
 namespace ES_Admin\Adapters;
+use \ES_Admin\Debug as Debug;
 
 /**
  * An adapter for WordPress.com VIP.
@@ -114,8 +115,10 @@ class WP_Com extends Adapter {
 			 * @var array Elasticsearch DSL query as a PHP array.
 			 */
 			$es_args = apply_filters( 'es_admin_wp_com_es_args', $es_args );
+			Debug::log( $es_args );
 
 			$response = es_api_search_index( $es_args, 'es-admin' );
+			Debug::log( $response );
 
 			// Normalize response (ES is hits.hits, wpcom is results.hits; ES is
 			// aggregations, wpcom is results.aggregations).
@@ -127,7 +130,7 @@ class WP_Com extends Adapter {
 					unset( $response['hits']['aggregations'] );
 				}
 			}
-
+			Debug::log( $response );
 			return $response;
 		}
 	}

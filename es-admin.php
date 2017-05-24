@@ -58,4 +58,7 @@ if ( is_admin() ) {
 
 	// Load the integration class.
 	add_action( 'after_setup_theme', [ '\ES_Admin\Integration', 'instance' ] );
+
+	// Debugging
+	add_action( 'wp_ajax_es_console', [ '\ES_Admin\Debug', 'es_query' ] );
 }
