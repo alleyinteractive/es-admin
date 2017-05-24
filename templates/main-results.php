@@ -19,4 +19,6 @@ if ( empty( $_GET['s'] ) ) {
 	<input type="hidden" name="s" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ) ?>" />
 
 	<?php $results->display() ?>
+
+	<?php Debug::output() ?>
 </form>
