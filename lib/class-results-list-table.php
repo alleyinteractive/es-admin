@@ -131,6 +131,7 @@ class Results_List_Table extends \WP_List_Table {
 			if ( $lock_holder ) {
 				$lock_holder = get_userdata( $lock_holder );
 				$locked_avatar_html = get_avatar( $lock_holder->ID, 18 );
+				/* translators: %s: name of editor */
 				$locked_text = sprintf( __( '%s is currently editing', 'es-admin' ), $lock_holder->display_name );
 			} else {
 				$locked_avatar_html = $locked_text = '';
@@ -163,6 +164,7 @@ class Results_List_Table extends \WP_List_Table {
 			$time_diff = time() - $time;
 
 			if ( $time_diff > 0 && $time_diff < DAY_IN_SECONDS ) {
+				/* translators: %s: span of time */
 				$h_time = sprintf( __( '%s ago', 'es-admin' ), human_time_diff( $time ) );
 			} else {
 				$h_time = mysql2date( __( 'Y/m/d', 'es-admin' ), $m_time );
