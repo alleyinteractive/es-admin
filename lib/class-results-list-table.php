@@ -548,10 +548,10 @@ class Results_List_Table extends \WP_List_Table {
 		$GLOBALS['post'] = $post; // WPCS: override ok.
 		setup_postdata( $post );
 
-		$classes = '';
+		$classes = [];
 		$lock_holder = wp_check_post_lock( $post->ID );
 		if ( $lock_holder ) {
-			$classes .= ' wp-locked';
+			$classes[] = 'wp-locked';
 		}
 
 		?>
