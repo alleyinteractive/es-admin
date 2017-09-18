@@ -79,12 +79,18 @@ class DSL {
 	/**
 	 * Build a missing DSL fragment.
 	 *
-	 * @param  string $field  ES field.
-	 * @param  array  $args Optional. Additional DSL arguments.
+	 * @param  string $field ES field.
+	 * @param  array  $args  Optional. Additional DSL arguments.
 	 * @return array DSL fragment.
 	 */
-	public static function missing( $field, $args = array() ) {
-		return array( 'missing' => array_merge( array( 'field' => $field ), $args ) );
+	public static function missing( $field, $args = [] ) {
+		return [
+			'bool' => [
+				'must_not' => [
+					'exists' => array_merge( [ 'field' => $field ], $args ),
+				],
+			],
+		];
 	}
 
 	/**
