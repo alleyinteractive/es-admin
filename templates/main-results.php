@@ -14,9 +14,9 @@ if ( empty( $_GET['s'] ) ) {
 
 <form id="es-admin-search-results" method="get">
 	<?php if ( ! empty( $_REQUEST['page'] ) ) : ?>
-		<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) ) ?>" />
+		<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) ); ?>" />
 	<?php endif ?>
-	<input type="hidden" name="s" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ) ?>" />
+	<input type="hidden" name="s" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ); ?>" />
 
-	<?php $results->display() ?>
+	<?php $results->display(); ?>
 </form>

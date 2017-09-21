@@ -114,7 +114,7 @@ class Facet {
 			$this->title = apply_filters( 'es_admin_facet_title', null, $this->label, $this->type, $this->subtype );
 			if ( null === $this->title ) {
 				switch ( $this->type ) {
-					case 'taxonomy' :
+					case 'taxonomy':
 						$taxonomy_object = get_taxonomy( $this->subtype );
 						if ( ! empty( $taxonomy_object->labels->name ) ) {
 							$this->title = $taxonomy_object->labels->name;
@@ -123,19 +123,19 @@ class Facet {
 						}
 						break;
 
-					case 'post_type' :
+					case 'post_type':
 						$this->title = __( 'Content Type', 'es-admin' );
 						break;
 
-					case 'post_date' :
+					case 'post_date':
 						$this->title = __( 'Date', 'es-admin' );
 						break;
 
-					case 'post_author' :
+					case 'post_author':
 						$this->title = __( 'Author', 'es-admin' );
 						break;
 
-					default :
+					default:
 						$this->title = $this->label;
 						break;
 				}
@@ -161,7 +161,7 @@ class Facet {
 			return $bucket['key_as_string'];
 		} else {
 			switch ( $this->type ) {
-				case 'taxonomy' :
+				case 'taxonomy':
 					$get_term_by = ( function_exists( 'wpcom_vip_get_term_by' ) ? 'wpcom_vip_get_term_by' : 'get_term_by' );
 					$term = call_user_func( $get_term_by, 'slug', $bucket['key'], $this->subtype );
 					if ( ! empty( $term->name ) ) {
@@ -169,20 +169,20 @@ class Facet {
 					}
 					break;
 
-				case 'post_type' :
+				case 'post_type':
 					$post_type_obj = get_post_type_object( $bucket['key'] );
 					if ( ! empty( $post_type_obj->labels->name ) ) {
 						return $post_type_obj->labels->name;
 					}
 					break;
 
-				case 'post_date' :
+				case 'post_date':
 					if ( is_numeric( $bucket['key'] ) ) {
 						return date( 'Y-m-d', absint( $bucket['key'] ) / 1000 );
 					}
 					break;
 
-				case 'post_author' :
+				case 'post_author':
 					$name = get_the_author_meta( 'display_name', absint( $bucket['key'] ) );
 					if ( $name ) {
 						return $name;

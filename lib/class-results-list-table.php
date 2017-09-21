@@ -354,7 +354,7 @@ class Results_List_Table extends \WP_List_Table {
 				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
 			}
 
-			$query = new \WP_Query;
+			$query = new \WP_Query();
 			$this->items = $query->query( $args );
 
 			$this->set_pagination_args( array(
@@ -407,11 +407,11 @@ class Results_List_Table extends \WP_List_Table {
 			if ( ! empty( $_GET['orderby'] ) ) {
 				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc'; // WPCS: sanitization ok.
 				switch ( $_GET['orderby'] ) {
-					case 'relevance' :
+					case 'relevance':
 						$orderby = '_score';
 						break;
 
-					default :
+					default:
 						$orderby = 'post_date';
 						break;
 				}
@@ -475,7 +475,7 @@ class Results_List_Table extends \WP_List_Table {
 				return;
 			}
 
-			$query = new \WP_Query;
+			$query = new \WP_Query();
 			$this->items = $query->query( [
 				'post_type' => get_post_types(),
 				'post_status' => 'any',
