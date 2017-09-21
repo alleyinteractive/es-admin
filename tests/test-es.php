@@ -25,9 +25,10 @@ class Test_ES extends \WP_UnitTestCase {
 		parent::tearDown();
 	}
 
+	/**
+	 * @expectedException \ES_Admin\Exception
+	 */
 	public function test_no_adapter() {
-		$this->expectException( Exception::class );
-
 		$this->es->set_adapter( null );
 	}
 
