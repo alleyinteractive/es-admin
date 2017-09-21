@@ -35,6 +35,9 @@ class Generic extends Adapter {
 			'http://localhost:9200/es-wp-query-unit-tests/post/_search',
 			[
 				'body' => json_encode( $es_args ),
+				'headers' => [
+					'Content-Type' => 'application/json',
+				],
 			]
 		);
 		return json_decode( wp_remote_retrieve_body( $response ), true );

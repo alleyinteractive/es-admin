@@ -354,7 +354,7 @@ class Results_List_Table extends \WP_List_Table {
 				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
 			}
 
-			$query = new \WP_Query;
+			$query = new \WP_Query();
 			$this->items = $query->query( $args );
 
 			$this->set_pagination_args( array(
@@ -367,7 +367,7 @@ class Results_List_Table extends \WP_List_Table {
 			// Setup base filters.
 			// @todo remove post_types that the current user can't access.
 			$post_types = array_values( get_post_types( [ 'public' => true ] ) );
-			$post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
+			$exclude_post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
 
 			$facets = apply_filters( 'es_admin_configured_facets', [
 				new Facets\Post_Type(),
@@ -376,21 +376,15 @@ class Results_List_Table extends \WP_List_Table {
 				new Facets\Post_Date(),
 			] );
 
-			$filters = [
-				DSL::terms( $es->map_field( 'post_type' ), $post_types ),
-				[ 'not' => DSL::terms( $es->map_field( 'post_status' ), $post_statuses ) ],
-			];
-
 			// Build the ES args.
 			$args = [
 				'query' => [
-					'filtered' => [
-						'filter' => [
-							'and' => $filters,
-						],
+					'bool' => [
+						'filter' => [ DSL::terms( $es->map_field( 'post_type' ), $post_types ) ],
+						'must_not' => DSL::terms( $es->map_field( 'post_status' ), $exclude_post_statuses ),
 					],
 				],
-				'fields' => [
+				'_source' => [
 					'post_id',
 				],
 				'from' => 0,
@@ -399,7 +393,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Build the search query.
 			if ( ! empty( $_GET['s'] ) ) {
-				$args['query']['filtered']['query'] = DSL::search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
+				$args['query']['bool']['must'][] = DSL::search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
 			}
 
 			// Setup pagination.
@@ -413,11 +407,11 @@ class Results_List_Table extends \WP_List_Table {
 			if ( ! empty( $_GET['orderby'] ) ) {
 				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc'; // WPCS: sanitization ok.
 				switch ( $_GET['orderby'] ) {
-					case 'relevance' :
+					case 'relevance':
 						$orderby = '_score';
 						break;
 
-					default :
+					default:
 						$orderby = 'post_date';
 						break;
 				}
@@ -446,7 +440,7 @@ class Results_List_Table extends \WP_List_Table {
 				$aggs = array_merge( $aggs, $facet_type->request() );
 				if ( ! empty( $_GET['facets'][ $facet_type->query_var() ] ) ) {
 					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // WPCS: sanitization ok.
-					$args['query']['filtered']['filter']['and'][] = $facet_type->filter( $values );
+					$args['query']['bool']['filter'][] = $facet_type->filter( $values );
 				}
 			}
 
@@ -467,11 +461,11 @@ class Results_List_Table extends \WP_List_Table {
 
 			$post_ids = array();
 			foreach ( $search->hits() as $hit ) {
-				if ( empty( $hit['fields'][ $es->map_field( 'post_id' ) ] ) ) {
+				if ( empty( $hit['_source'][ $es->map_field( 'post_id' ) ] ) ) {
 					continue;
 				}
 
-				$post_id = (array) $hit['fields'][ $es->map_field( 'post_id' ) ];
+				$post_id = (array) $hit['_source'][ $es->map_field( 'post_id' ) ];
 				$post_ids[] = absint( reset( $post_id ) );
 			}
 
@@ -481,7 +475,7 @@ class Results_List_Table extends \WP_List_Table {
 				return;
 			}
 
-			$query = new \WP_Query;
+			$query = new \WP_Query();
 			$this->items = $query->query( [
 				'post_type' => get_post_types(),
 				'post_status' => 'any',

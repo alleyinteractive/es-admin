@@ -15,37 +15,37 @@ abstract class Adapter {
 	 * Map core fields to the ES index.
 	 *
 	 * In addition to what's below, other fields include:
-	 * 		post_id
+	 *      post_id
 	 *      post_author
-	 *      	post_author.user_nicename
-	 *      	post_author.display_name
-	 * 		post_date
-	 * 			post_date.year
-	 * 			post_date.month
-	 * 			post_date.week
-	 * 			post_date.day
-	 * 			post_date.day_of_year
-	 * 			post_date.day_of_week
-	 * 			post_date.hour
-	 * 			post_date.minute
-	 * 			post_date.second
-	 * 		post_date_gmt (plus all the same tokens as post_date)
-	 * 		post_content
-	 * 			post_content.analyzed
-	 * 		post_title
-	 * 			post_title.analyzed
-	 * 		post_excerpt
-	 * 		post_status
-	 * 		ping_status
-	 * 		post_password
-	 * 		post_name
-	 * 		post_modified (plus all the same tokens as post_date)
-	 * 		post_modified_gmt (plus all the same tokens as post_date)
-	 * 		post_parent
-	 * 		menu_order
-	 * 		post_type
-	 * 		post_mime_type
-	 * 		comment_count
+	 *          post_author.user_nicename
+	 *          post_author.display_name
+	 *      post_date
+	 *          post_date.year
+	 *          post_date.month
+	 *          post_date.week
+	 *          post_date.day
+	 *          post_date.day_of_year
+	 *          post_date.day_of_week
+	 *          post_date.hour
+	 *          post_date.minute
+	 *          post_date.second
+	 *      post_date_gmt (plus all the same tokens as post_date)
+	 *      post_content
+	 *          post_content.analyzed
+	 *      post_title
+	 *          post_title.analyzed
+	 *      post_excerpt
+	 *      post_status
+	 *      ping_status
+	 *      post_password
+	 *      post_name
+	 *      post_modified (plus all the same tokens as post_date)
+	 *      post_modified_gmt (plus all the same tokens as post_date)
+	 *      post_parent
+	 *      menu_order
+	 *      post_type
+	 *      post_mime_type
+	 *      comment_count
 	 *
 	 * @var array
 	 */

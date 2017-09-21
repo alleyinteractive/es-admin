@@ -42,7 +42,7 @@ class ES {
 	public function setup() {
 		$adapter = apply_filters( 'es_admin_adapter', null );
 		if ( class_exists( $adapter ) ) {
-			$this->adapter = new $adapter;
+			$this->adapter = new $adapter();
 		}
 
 		if ( ! ( $this->adapter instanceof Adapters\Adapter ) ) {
@@ -110,7 +110,7 @@ class ES {
 		if ( $search instanceof Search ) {
 			$this->main_search = $search;
 		} else {
-			$this->main_search = new Search;
+			$this->main_search = new Search();
 		}
 	}
 

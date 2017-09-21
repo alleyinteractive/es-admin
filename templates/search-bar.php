@@ -12,7 +12,7 @@ namespace ES_Admin;
 	<label class="screen-reader-text" for="es-admin-search-input"><?php esc_html_e( 'Search:', 'es-admin' ); ?></label>
 	<input type="search" id="es-admin-search-input" name="s" value="<?php _admin_search_query(); ?>" />
 	<?php if ( ! empty( $_REQUEST['page'] ) ) : ?>
-		<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) ) ?>" />
+		<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) ); ?>" />
 	<?php endif ?>
 
 	<?php
@@ -24,5 +24,5 @@ namespace ES_Admin;
 	}
 	?>
 
-	<?php submit_button( __( 'Search', 'es-admin' ), 'button', '', false ) ?>
+	<?php submit_button( __( 'Search', 'es-admin' ), 'button', '', false ); ?>
 </form>
