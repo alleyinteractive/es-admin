@@ -27,14 +27,9 @@ class Post_Date extends Facet_Type {
 	public function request() {
 		return [
 			'post_date' => [
-				'date_histogram' => [
+				'date_range' => [
 					'field' => $this->es->map_field( 'post_date' ),
-					'interval' => 'month',
-					'format' => 'yyyy-MM',
-					'min_doc_count' => 2,
-					'order' => [
-						'_key' => 'desc',
-					],
+					'format' => 'yyyy-MM-dd',
 				],
 			],
 		];
@@ -54,6 +49,10 @@ class Post_Date extends Facet_Type {
 			$should[] = DSL::range( $this->es->map_field( 'post_date' ), [ 'gte' => $gte, 'lt' => $lt ] );
 		}
 
-		return array( 'bool' => array( 'should' => $should ) );
+		return [
+			'bool' => [
+				'should' => $should,
+			],
+		];
 	}
 }
