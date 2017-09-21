@@ -33,7 +33,7 @@ class Settings {
 	public function setup() {
 		// All settings currently require ES_WP_Query, so we need it to be
 		// present. In the future, this will likely change.
-		if ( class_exists( 'ES_WP_Query' ) ) {
+		if ( class_exists( '\ES_WP_Query' ) ) {
 			add_action( 'admin_menu', [ $this, 'add_settings_page' ] );
 			add_action( 'admin_post_es_admin_settings', [ $this, 'process_form' ] );
 		}

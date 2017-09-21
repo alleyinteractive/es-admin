@@ -40,13 +40,36 @@ class ES {
 	 * @throws \Exception If the adapter is invalid.
 	 */
 	public function setup() {
+		/**
+		 * Filter the adapter that ES_Admin should use.
+		 *
+		 * @param string|Adapters\Adapter $adapter Class name or instance.
+		 */
 		$adapter = apply_filters( 'es_admin_adapter', null );
-		if ( class_exists( $adapter ) ) {
-			$this->adapter = new $adapter();
+		if ( $adapter ) {
+			$this->set_adapter( $adapter );
 		}
+	}
 
-		if ( ! ( $this->adapter instanceof Adapters\Adapter ) ) {
-			throw new \Exception( __( 'Invalid Elasticsearch Adapter', 'es-admin' ) );
+	/**
+	 * Set the adapter that ES_Admin should use.
+	 *
+	 * @throws Exception If the adapter is not valid.
+	 * @param string|Adapters\Adapter $adapter Class name or instance.
+	 */
+	public function set_adapter( $adapter ) {
+		if ( $adapter instanceof Adapters\Adapter ) {
+			$this->adapter =& $adapter;
+		} else {
+			if ( class_exists( $adapter ) ) {
+				$this->adapter = new $adapter();
+			} else {
+				$this->adapter = null;
+			}
+
+			if ( ! ( $this->adapter instanceof Adapters\Adapter ) ) {
+				throw new Exception( __( 'Invalid Elasticsearch Adapter', 'es-admin' ) );
+			}
 		}
 	}
 
@@ -78,9 +101,9 @@ class ES {
 	 * @return string The mapped field.
 	 */
 	public function map_tax_field( $taxonomy, $field ) {
-		if ( 'post_tag' == $taxonomy ) {
+		if ( 'post_tag' === $taxonomy ) {
 			$field = str_replace( 'term_', 'tag_', $field );
-		} elseif ( 'category' == $taxonomy ) {
+		} elseif ( 'category' === $taxonomy ) {
 			$field = str_replace( 'term_', 'category_', $field );
 		}
 		return sprintf( $this->map_field( $field ), $taxonomy );
