@@ -32,9 +32,9 @@ class Generic extends Adapter {
 	 */
 	public function query( $es_args ) {
 		$response = wp_remote_post(
-			'http://localhost:9200/es-wp-query-unit-tests/post/_search',
+			'http://localhost:9200/es-admin-unit-tests/post/_search',
 			[
-				'body' => json_encode( $es_args ),
+				'body' => wp_json_encode( $es_args ),
 				'headers' => [
 					'Content-Type' => 'application/json',
 				],

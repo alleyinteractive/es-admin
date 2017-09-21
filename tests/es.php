@@ -7,6 +7,8 @@
 
 namespace ES_Admin;
 
+class ES_Index_Exception extends \Exception {}
+
 function verify_es_is_running( $tries = 5, $sleep = 3 ) {
 	// Make sure ES is running and responding
 	do {

@@ -37,7 +37,7 @@
 
 namespace ES_Admin;
 
-if ( is_admin() ) {
+if ( is_admin() || ( defined( 'ES_ADMIN_TEST_ENV' ) && ES_ADMIN_TEST_ENV ) ) {
 	define( __NAMESPACE__ . '\PATH', __DIR__ );
 	define( __NAMESPACE__ . '\URL', trailingslashit( plugins_url( '', __FILE__ ) ) );
 

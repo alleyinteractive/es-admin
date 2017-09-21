@@ -37,6 +37,10 @@ function _manually_load_plugin() {
 		echo "\n\nFatal: bootstrap check failed!\n";
 		exit( 1 );
 	}
+
+	add_filter( 'es_admin_adapter', function( $adapter ) {
+		return 'ES_Admin\Adapters\Generic';
+	} );
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
