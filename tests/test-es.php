@@ -32,6 +32,9 @@ class Test_ES extends \WP_UnitTestCase {
 		$this->es->set_adapter( null );
 	}
 
+	/**
+	 * @requires PHPUnit 5.4
+	 */
 	public function test_query() {
 		$adapter = $this->createMock( '\ES_Admin\Adapters\Generic' );
 		$adapter->method( 'query' )
@@ -41,6 +44,9 @@ class Test_ES extends \WP_UnitTestCase {
 		$this->assertSame( 'query tested', $this->es->query( 123 ) );
 	}
 
+	/**
+	 * @requires PHPUnit 5.4
+	 */
 	public function test_map_field() {
 		$adapter = $this->createMock( '\ES_Admin\Adapters\Generic' );
 		$adapter->method( 'map_field' )
@@ -78,6 +84,9 @@ class Test_ES extends \WP_UnitTestCase {
 		$this->assertSame( 'post_meta._thumbnail_id.date', $this->es->map_meta_field( '_thumbnail_id', 'date' ) );
 	}
 
+	/**
+	 * @requires PHPUnit 5.4
+	 */
 	public function test_main_search() {
 		$search = $this->createMock( '\ES_Admin\Search' );
 		$search->method( 'hits' )
