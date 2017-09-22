@@ -11,4 +11,15 @@
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">./</directory>
+			<exclude>
+				<directory suffix=".php">./tests/</directory>
+				<directory suffix=".php">./templates/</directory>
+				<file>./lib/autoload.php</file>
+				<file>./lib/trait-singleton.php</file>
+			</exclude>
+		</whitelist>
+	</filter>
 </phpunit>
