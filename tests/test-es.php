@@ -84,10 +84,14 @@ class Test_ES extends \WP_UnitTestCase {
 		$this->assertSame( 'post_meta._thumbnail_id.date', $this->es->map_meta_field( '_thumbnail_id', 'date' ) );
 	}
 
+	public function test_main_search() {
+		$this->assertInstanceOf( '\ES_Admin\Search', $this->es->main_search() );
+	}
+
 	/**
 	 * @requires PHPUnit 5.4
 	 */
-	public function test_main_search() {
+	public function test_set_main_search() {
 		$search = $this->createMock( '\ES_Admin\Search' );
 		$search->method( 'hits' )
 			->willReturn( 'search results' );
