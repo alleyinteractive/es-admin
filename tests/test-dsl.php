@@ -10,13 +10,9 @@ namespace ES_Admin;
 /**
  * DSL test case.
  */
-class Test_DSL extends \WP_UnitTestCase {
-	protected $es;
-
+class Test_DSL extends ES_Admin_Test_Case {
 	public function setUp() {
 		parent::setUp();
-
-		$this->es = ES::instance();
 
 		$cat_a = $this->factory->term->create( [ 'taxonomy' => 'category', 'name' => 'cat-a' ] );
 		$cat_b = $this->factory->term->create( [ 'taxonomy' => 'category', 'name' => 'cat-b' ] );
@@ -31,40 +27,6 @@ class Test_DSL extends \WP_UnitTestCase {
 		$this->factory->post->create( [ 'post_title' => 'tags-a-and-b', 'tags_input' => [ 'tag-a', 'tag-b' ], 'post_date' => '2010-08-01 00:00:00' ] );
 
 		index_test_data();
-	}
-
-	protected function base_dsl() {
-		return [
-			'query' => [],
-			'_source' => [
-				'post_title',
-			],
-			'from' => 0,
-			'size' => 10,
-		];
-	}
-
-	protected function query_and_get_post_titles( $args ) {
-		// Run the search.
-		$search = new Search( $args );
-
-		if ( ! $search->has_hits() ) {
-			return [];
-		}
-
-		// Extract only the post ids.
-		$post_titles = array_map( function( $hit ) {
-			if ( empty( $hit['_source'][ $this->es->map_field( 'post_title' ) ] ) ) {
-				return null;
-			}
-
-			$post_title = (array) $hit['_source'][ $this->es->map_field( 'post_title' ) ];
-			return reset( $post_title );
-
-		}, $search->hits() );
-
-		// Return the post ids.
-		return array_filter( $post_titles );
 	}
 
 	public function test_search_query() {

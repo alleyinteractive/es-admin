@@ -10,21 +10,7 @@ namespace ES_Admin;
 /**
  * ES test case.
  */
-class Test_ES extends \WP_UnitTestCase {
-	protected $es;
-
-	public function setUp() {
-		parent::setUp();
-		$this->es = ES::instance();
-	}
-
-	public function tearDown() {
-		// Reset the adapter to the default used by these unit tests.
-		$this->es->setup();
-
-		parent::tearDown();
-	}
-
+class Test_ES extends ES_Admin_Test_Case {
 	/**
 	 * @expectedException \ES_Admin\Exception
 	 */

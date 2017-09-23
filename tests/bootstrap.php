@@ -58,3 +58,6 @@ tests_add_filter( 'es_admin_adapter', '_es_admin_phpunit_adapter' );
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
+
+// Load Test Case class.
+require_once __DIR__ . '/class-es-admin-test-case.php';
