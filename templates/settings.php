@@ -22,7 +22,7 @@
 				<th scope="row"><?php esc_html_e( 'Enable Core Integration', 'es-admin' ); ?></th>
 				<td>
 					<label for="es-admin-enable-integration">
-						<input name="enable_integration" id="es-admin-enable-integration" type="checkbox" value="1" <?php checked( true, $this->get_settings( 'enable_integration' ) ); ?> />
+						<input name="enable_integration" id="es-admin-enable-integration" type="checkbox" value="1" <?php checked( $this->get_settings( 'enable_integration' ) ); ?> />
 						<?php esc_html_e( 'Replace core admin searches with Elasticsearch', 'es-admin' ); ?>
 					</label>
 				</td>
