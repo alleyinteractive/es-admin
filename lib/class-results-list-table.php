@@ -364,13 +364,6 @@ class Results_List_Table extends \WP_List_Table {
 		} else {
 			$es = ES::instance();
 
-			$facets = apply_filters( 'es_admin_configured_facets', [
-				new Facets\Post_Type(),
-				new Facets\Category(),
-				new Facets\Tag(),
-				new Facets\Post_Date(),
-			] );
-
 			// Build the ES args.
 			$args = [
 				'query' => [],
@@ -424,31 +417,28 @@ class Results_List_Table extends \WP_List_Table {
 			}
 			$args['sort'] = apply_filters( 'es_admin_table_sort', $args['sort'], $es, $args );
 
-			// Build the facets and add filters from any facets in the request.
-			$aggs = [];
-			foreach ( $facets as $facet_type ) {
-				$aggs = array_merge( $aggs, $facet_type->request() );
-				if ( ! empty( $_GET['facets'][ $facet_type->query_var() ] ) ) {
-					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // WPCS: sanitization ok.
-					$args['query']['bool']['filter'][] = $facet_type->filter( $values );
-				}
-			}
-
-			$aggs = apply_filters( 'es_admin_facets_query', $aggs );
-			if ( ! empty( $aggs ) ) {
-				$args['aggs'] = $aggs;
-			}
-
-			// Run the search.
-			$this->items = [];
-
 			/**
 			 * Filter the search page's query DSL before sending to ES.
 			 *
 			 * @param array $args ES Query DSL, as a PHP array.
 			 */
 			$args = apply_filters( 'es_admin_search_page_query_dsl', $args );
-			$search = new Search( $args );
+
+			/**
+			 * Filter the facet objects used in the search page.
+			 *
+			 * @param array $facets \ES_Admin\Facets\Facet_Type objects.
+			 */
+			$facets = apply_filters( 'es_admin_configured_facets', [
+				new Facets\Date_Histogram(),
+				new Facets\Post_Type(),
+				new Facets\Category(),
+				new Facets\Tag(),
+			] );
+
+			// Run the search.
+			$this->items = [];
+			$search = new Search( $args, $facets );
 			$es->set_main_search( $search );
 
 			if ( ! $search->has_hits() ) {

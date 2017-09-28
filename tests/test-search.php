@@ -37,14 +37,7 @@ class Test_Search extends ES_Admin_Test_Case {
 	public function test_facets() {
 		$dsl = $this->base_dsl();
 		$dsl['query']['match_all'] = new \stdClass();
-		$dsl['aggregations'] = [
-			'taxonomy_post_tag' => [
-				'terms' => [
-					'field' => $this->es->map_tax_field( 'post_tag', 'tag_slug' ),
-				],
-			],
-		];
-		$search = new Search( $dsl );
+		$search = new Search( $dsl, [ new Facets\Tag() ] );
 
 		$this->assertTrue( $search->has_facets() );
 
