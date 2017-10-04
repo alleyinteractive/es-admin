@@ -29,6 +29,7 @@ class Test_Search extends ES_Admin_Test_Case {
 		$search = new Search( $dsl );
 		$this->assertTrue( $search->has_hits() );
 		$this->assertFalse( $search->has_facets() );
+		$this->assertFalse( $search->has_facet_responses() );
 		$this->assertSame( 1, $search->total() );
 		$hits = $search->hits();
 		$this->assertSame( [ 'embedded-video' ], (array) $hits[0]['_source']['post_title'] );
@@ -36,10 +37,10 @@ class Test_Search extends ES_Admin_Test_Case {
 
 	public function test_facets() {
 		$dsl = $this->base_dsl();
-		$dsl['query']['match_all'] = new \stdClass();
 		$search = new Search( $dsl, [ new Facets\Tag() ] );
 
 		$this->assertTrue( $search->has_facets() );
+		$this->assertTrue( $search->has_facet_responses() );
 
 		$facets = $search->facets();
 		$this->assertCount( 1, $facets );
@@ -49,5 +50,73 @@ class Test_Search extends ES_Admin_Test_Case {
 		$this->assertCount( 2, $buckets );
 		$this->assertEqualSets( [ 'tag-a', 'tag-b' ], array_column( $buckets, 'key' ) );
 		$this->assertSame( [ 2, 2 ], array_column( $buckets, 'doc_count' ) );
+	}
+
+	public function test_facetizing_args() {
+		$search = new Search_Spy();
+		$dsl = $this->base_dsl();
+
+		$facetized_args = $search->test_facetized_args( $dsl, [ new Facets\Tag() ] );
+
+		// Confirm that Search::$es_args didn't change.
+		$this->assertSame( $dsl, $search->es_args );
+
+		// Filters shouldn't have been modified.
+		$this->assertTrue( empty( $search->es_args['query']['bool']['filter'] ) );
+		$this->assertTrue( empty( $facetized_args['query']['bool']['filter'] ) );
+
+		// Aggs should have been modified.
+		$this->assertTrue( empty( $search->es_args['aggs'] ) );
+		$this->assertFalse( empty( $facetized_args['aggs'] ) );
+
+		// The only change should have been to aggs, so remove that and confirm.
+		unset( $facetized_args['aggs'] );
+		$this->assertSame( $dsl, $facetized_args );
+	}
+
+	public function test_facetizing_args_filtered() {
+		$_GET = [ 'facets' => [ 'tag' => 'tag-a' ] ];
+		$search = new Search_Spy();
+		$dsl = $this->base_dsl();
+
+		$facetized_args = $search->test_facetized_args( $dsl, [ new Facets\Tag() ] );
+
+		// Confirm that Search::$es_args didn't change.
+		$this->assertSame( $dsl, $search->es_args );
+
+		// Filters should have been modified because of $_GET.
+		$this->assertTrue( empty( $search->es_args['query']['bool']['filter'] ) );
+		$this->assertFalse( empty( $facetized_args['query']['bool']['filter'] ) );
+
+		// Aggs should have been modified.
+		$this->assertTrue( empty( $search->es_args['aggs'] ) );
+		$this->assertFalse( empty( $facetized_args['aggs'] ) );
+
+		// The only changes should have been to aggs and filters, so remove
+		// them and confirm.
+		unset( $facetized_args['aggs'], $facetized_args['query']['bool'] );
+		$this->assertSame( $dsl, $facetized_args );
+	}
+
+	public function test_no_query() {
+		$dsl = $this->base_dsl();
+		$search = new Search( $dsl );
+
+		$this->assertTrue( $search->has_hits() );
+		$this->assertFalse( $search->has_facets() );
+		$this->assertFalse( $search->has_facet_responses() );
+		$this->assertSame( 5, $search->total() );
+		$this->assertTrue( empty( $search->es_args['query'] ) );
+	}
+
+	public function test_no_results() {
+		$dsl = $this->base_dsl();
+		$dsl['query']['term']['post_title'] = 'zzzzzzzzzzzz';
+		$search = new Search( $dsl );
+
+		$this->assertFalse( $search->has_hits() );
+		$this->assertFalse( $search->has_facets() );
+		$this->assertFalse( $search->has_facet_responses() );
+		$this->assertSame( 0, $search->total() );
 	}
 }

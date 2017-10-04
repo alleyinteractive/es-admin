@@ -17,6 +17,8 @@
 			<exclude>
 				<directory suffix=".php">./tests/</directory>
 				<directory suffix=".php">./templates/</directory>
+				<file>./lib/adapters/class-searchpress.php</file>
+				<file>./lib/adapters/class-wp-com.php</file>
 				<file>./lib/autoload.php</file>
 				<file>./lib/trait-singleton.php</file>
 			</exclude>

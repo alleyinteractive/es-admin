@@ -50,6 +50,7 @@ class Search {
 	 * Build the search.
 	 *
 	 * @param array $es_args Elasticsearch DSL.
+	 * @param array $facets  \ES_Admin\Facets\Facet_Type objects.
 	 */
 	public function __construct( $es_args = null, array $facets = [] ) {
 		if ( $facets ) {
@@ -64,9 +65,31 @@ class Search {
 	/**
 	 * Run the query.
 	 */
-	protected function query() {
+	public function query() {
 		$es_args = $this->facetized_args();
+		// Ensure that query is never empty.
+		if ( empty( $es_args['query'] ) ) {
+			$es_args['query'] = [
+				'match_all' => new \stdClass(),
+			];
+		}
+
+		/**
+		 * Filter the final query before sending to Elasticsearch.
+		 *
+		 * @param array  $es_args Elasticsearch DSL.
+		 * @param Search $search  This object.
+		 */
+		$es_args = apply_filters( 'es_admin_query', $es_args, $this );
 		$this->results = ES::instance()->query( $es_args );
+
+		/**
+		 * Filter the query results prior to parsing them.
+		 *
+		 * @param array  $results Raw Elasticsearch response.
+		 * @param array  $es_args Elasticsearch DSL.
+		 * @param Search $search  This object.
+		 */
 		$this->results = apply_filters( 'es_admin_results', $this->results, $es_args, $this );
 		$this->parse_hits();
 		$this->parse_total();
@@ -96,10 +119,22 @@ class Search {
 	 * Pull the hits out of the ES response.
 	 */
 	protected function parse_hits() {
-		$this->hits = apply_filters( 'es_admin_parse_hits', [], $this->results, $this );
-		if ( empty( $this->hits ) ) {
+		/**
+		 * Allow plugins/themes to short-circuit how the hits get parsed from
+		 * the raw Elasticsearch response.
+		 *
+		 * @param null|array $hits    By default, this is null. If this becomes
+		 *                            an array through the filter, default
+		 *                            processing is skipped.
+		 * @param array      $results Raw Elasticsearch response.
+		 * @param Search     $search  This object.
+		 */
+		$this->hits = apply_filters( 'es_admin_parse_hits', null, $this->results, $this );
+		if ( ! is_array( $this->hits ) ) {
 			if ( ! empty( $this->results['hits']['hits'] ) ) {
 				$this->hits = $this->results['hits']['hits'];
+			} else {
+				$this->hits = [];
 			}
 		}
 	}
@@ -108,8 +143,18 @@ class Search {
 	 * Pull the total out of the ES response.
 	 */
 	protected function parse_total() {
+		/**
+		 * Allow plugins/themes to short-circuit how the hits get parsed from
+		 * the raw Elasticsearch response.
+		 *
+		 * @param null|int $hits    By default, this is null. If this becomes an
+		 *                          int through the filter, default processing
+		 *                          is skipped.
+		 * @param array    $results Raw Elasticsearch response.
+		 * @param Search   $search     This object.
+		 */
 		$this->total = apply_filters( 'es_admin_parse_total', null, $this->results, $this );
-		if ( ! isset( $this->total ) ) {
+		if ( ! is_int( $this->total ) ) {
 			// Using isset because 0 is empty but valid.
 			if ( isset( $this->results['hits']['total'] ) ) {
 				$this->total = absint( $this->results['hits']['total'] );

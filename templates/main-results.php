@@ -8,7 +8,9 @@
 namespace ES_Admin;
 
 if ( empty( $_GET['s'] ) ) {
-	return;
+	$search_query = '';
+} else {
+	$search_query = sanitize_text_field( wp_unslash( $_GET['s'] ) );
 }
 ?>
 
@@ -16,7 +18,7 @@ if ( empty( $_GET['s'] ) ) {
 	<?php if ( ! empty( $_REQUEST['page'] ) ) : ?>
 		<input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) ); ?>" />
 	<?php endif ?>
-	<input type="hidden" name="s" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ); ?>" />
+	<input type="hidden" name="s" value="<?php echo esc_attr( $search_query ); ?>" />
 
 	<?php $results->display(); ?>
 </form>

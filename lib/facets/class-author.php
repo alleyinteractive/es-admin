@@ -1,6 +1,6 @@
 <?php
 /**
- * Post type facet type
+ * Author facet class.
  *
  * @package ES Admin
  */
@@ -9,15 +9,15 @@ namespace ES_Admin\Facets;
 use \ES_Admin\DSL as DSL;
 
 /**
- * Post type facet type
+ * Author facet type.
  */
-class Post_Type extends Facet_Type {
+class Author extends Facet_Type {
 	/**
 	 * The query var this facet should use.
 	 *
 	 * @var string
 	 */
-	protected $query_var = 'post_type';
+	protected $query_var = 'author';
 
 	/**
 	 * Build the facet type object.
@@ -26,8 +26,8 @@ class Post_Type extends Facet_Type {
 	 */
 	public function __construct( $args = [] ) {
 		$args = wp_parse_args( $args, [
-			'key' => 'post_type',
-			'title' => __( 'Content Type', 'es-admin' ),
+			'key' => 'author',
+			'title' => __( 'Author', 'es-admin' ),
 		] );
 		parent::__construct( $args );
 	}
@@ -40,7 +40,7 @@ class Post_Type extends Facet_Type {
 	public function request_dsl() {
 		return [
 			'terms' => [
-				'field' => $this->es->map_field( 'post_type' ),
+				'field' => $this->es->map_field( 'post_author' ),
 			],
 		];
 	}
@@ -53,9 +53,9 @@ class Post_Type extends Facet_Type {
 	 * @return string
 	 */
 	public function bucket_label( $bucket ) {
-		$post_type_obj = get_post_type_object( $bucket['key'] );
-		if ( ! empty( $post_type_obj->labels->name ) ) {
-			return $post_type_obj->labels->name;
+		$user = get_user_by( 'id', intval( $bucket['key'] ) );
+		if ( $user instanceof \WP_User && ! empty( $user->display_name ) ) {
+			return $user->display_name;
 		}
 		return $bucket['key'];
 	}
@@ -67,7 +67,8 @@ class Post_Type extends Facet_Type {
 	 * @return array
 	 */
 	public function filter( $values ) {
-		$field = $this->es->map_field( 'post_type' );
+		$values = array_map( 'intval', $values );
+		$field = $this->es->map_field( 'post_author' );
 		if ( 'and' === $this->logic() ) {
 			return DSL::all_terms( $field, $values );
 		} else {

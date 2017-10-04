@@ -84,7 +84,12 @@ class Taxonomy extends Facet_Type {
 	 * @return array
 	 */
 	public function filter( $values ) {
-		return DSL::all_terms( $this->es->map_tax_field( $this->taxonomy, 'term_slug' ), $values );
+		$field = $this->es->map_tax_field( $this->taxonomy, 'term_slug' );
+		if ( 'and' === $this->logic() ) {
+			return DSL::all_terms( $field, $values );
+		} else {
+			return DSL::terms( $field, $values );
+		}
 	}
 
 	/**
@@ -94,11 +99,11 @@ class Taxonomy extends Facet_Type {
 	 * @param  array  $bucket Bucket from ES.
 	 * @return string
 	 */
-	protected function customize_bucket_label( $label, $bucket ) {
+	public function bucket_label( $bucket ) {
 		$term = get_term_by( 'slug', $bucket['key'], $this->taxonomy );
 		if ( ! empty( $term->name ) ) {
 			return $term->name;
 		}
-		return $label;
+		return $bucket['key'];
 	}
 }

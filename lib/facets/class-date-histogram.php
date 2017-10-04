@@ -86,7 +86,7 @@ class Date_Histogram extends Facet_Type {
 	 * @param  array  $bucket Bucket from ES.
 	 * @return string
 	 */
-	protected function bucket_label( $bucket ) {
+	public function bucket_label( $bucket ) {
 		return $bucket['key_as_string'];
 	}
 
@@ -96,8 +96,8 @@ class Date_Histogram extends Facet_Type {
 	 * @param  array  $bucket Bucket from ES.
 	 * @return string
 	 */
-	protected function bucket_value( $bucket ) {
-		return absint( $bucket['key'] ) / 1000;
+	public function bucket_value( $bucket ) {
+		return absint( floor( $bucket['key'] / 1000 ) );
 	}
 
 	/**
@@ -107,6 +107,6 @@ class Date_Histogram extends Facet_Type {
 	 */
 	public function checked( $value ) {
 		$values = ! empty( $_GET['facets'][ $this->query_var() ] ) ? (array) $_GET['facets'][ $this->query_var() ] : []; // WPCS: sanitization ok.
-		checked( in_array( absint( $value ) / 1000, $values ) );
+		checked( in_array( absint( floor( $value / 1000 ) ), $values ) );
 	}
 }

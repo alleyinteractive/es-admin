@@ -92,6 +92,10 @@ abstract class Facet_Type {
 			}
 		}
 
+		if ( empty( $this->query_var ) ) {
+			$this->query_var = $this->key;
+		}
+
 		$this->es = ES::instance();
 	}
 
@@ -158,7 +162,7 @@ abstract class Facet_Type {
 	 * @param  array  $bucket Bucket from ES.
 	 * @return string
 	 */
-	protected function bucket_label( $bucket ) {
+	public function bucket_label( $bucket ) {
 		return $bucket['key'];
 	}
 
@@ -168,7 +172,7 @@ abstract class Facet_Type {
 	 * @param  array  $bucket Bucket from ES.
 	 * @return string
 	 */
-	protected function bucket_value( $bucket ) {
+	public function bucket_value( $bucket ) {
 		return $bucket['key'];
 	}
 

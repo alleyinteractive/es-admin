@@ -61,3 +61,7 @@ require $_tests_dir . '/includes/bootstrap.php';
 
 // Load Test Case class.
 require_once __DIR__ . '/class-es-admin-test-case.php';
+
+// Load doubles.
+require_once __DIR__ . '/doubles/class-search-spy.php';
+require_once __DIR__ . '/doubles/class-mock-facet.php';

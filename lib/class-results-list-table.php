@@ -36,12 +36,13 @@ class Results_List_Table extends \WP_List_Table {
 	 */
 	function get_columns() {
 		return [
-			'thumbnail' => _x( 'Image', 'column name', 'es-admin' ),
-			'title'     => _x( 'Title', 'column name', 'es-admin' ),
-			'post_type' => __( 'Type', 'es-admin' ),
-			'author'    => _x( 'Author', 'column name', 'es-admin' ),
-			'date'      => _x( 'Date', 'column name', 'es-admin' ),
-			// Taxonomies?
+			'thumbnail'  => _x( 'Image', 'column name', 'es-admin' ),
+			'title'      => _x( 'Title', 'column name', 'es-admin' ),
+			'post_type'  => __( 'Type', 'es-admin' ),
+			'author'     => _x( 'Author', 'column name', 'es-admin' ),
+			'date'       => _x( 'Date', 'column name', 'es-admin' ),
+			'categories' => _x( 'Categories', 'column name', 'es-admin' ),
+			'tags'       => _x( 'Tags', 'column name', 'es-admin' ),
 		];
 	}
 
@@ -282,8 +283,6 @@ class Results_List_Table extends \WP_List_Table {
 			 * This hook only fires if the current post type is hierarchical,
 			 * such as pages.
 			 *
-			 * @since 2.5.0
-			 *
 			 * @param string $column_name The name of the column to display.
 			 * @param int    $post_id     The current post ID.
 			 */
@@ -296,8 +295,6 @@ class Results_List_Table extends \WP_List_Table {
 			 * This hook only fires if the current post type is non-hierarchical,
 			 * such as posts.
 			 *
-			 * @since 1.5.0
-			 *
 			 * @param string $column_name The name of the column to display.
 			 * @param int    $post_id     The current post ID.
 			 */
@@ -308,8 +305,6 @@ class Results_List_Table extends \WP_List_Table {
 		 * Fires for each custom column of a specific post type in the Posts list table.
 		 *
 		 * The dynamic portion of the hook name, `$post->post_type`, refers to the post type.
-		 *
-		 * @since 3.1.0
 		 *
 		 * @param string $column_name The name of the column to display.
 		 * @param int    $post_id     The current post ID.
@@ -434,6 +429,7 @@ class Results_List_Table extends \WP_List_Table {
 				new Facets\Post_Type(),
 				new Facets\Category(),
 				new Facets\Tag(),
+				new Facets\Author(),
 			] );
 
 			// Run the search.
@@ -464,11 +460,11 @@ class Results_List_Table extends \WP_List_Table {
 
 			$query = new \WP_Query();
 			$this->items = $query->query( [
-				'post_type' => get_post_types(),
-				'post_status' => 'any',
+				'post_type' => array_values( get_post_types() ),
+				'post_status' => array_values( get_post_stati() ),
 				'posts_per_page' => $per_page,
 				'ignore_sticky_posts' => true,
-				'perm' => 'readable',
+				// 'perm' => 'readable',
 				'post__in' => $post_ids,
 				'orderby' => 'post__in',
 			] );
@@ -492,10 +488,14 @@ class Results_List_Table extends \WP_List_Table {
 	 * @return string The formatted link string.
 	 */
 	protected function get_edit_link( $args, $label, $class = '', $echo = false ) {
-		if ( empty( $args['page'] ) ) {
-			$args['page'] = 'es-admin-search';
+		if ( ! empty( $args['page'] ) ) {
+			$page = $args['page'];
+			unset( $args['page'] );
+		} else {
+			$page = 'es-admin-search';
 		}
-		$url = add_query_arg( $args, 'admin.php' );
+
+		$url = add_query_arg( [ 'page' => $page, 'facets' => $args ], 'admin.php' );
 
 		$class_html = '';
 		if ( ! empty( $class ) ) {
@@ -631,8 +631,6 @@ class Results_List_Table extends \WP_List_Table {
 			 *
 			 * The filter is evaluated only for hierarchical post types.
 			 *
-			 * @since 2.8.0
-			 *
 			 * @param array $actions An array of row action links. Defaults are
 			 *                         'Edit', 'Quick Edit', 'Restore, 'Trash',
 			 *                         'Delete Permanently', 'Preview', and 'View'.
@@ -645,8 +643,6 @@ class Results_List_Table extends \WP_List_Table {
 			 * Filter the array of row action links on the Posts list table.
 			 *
 			 * The filter is evaluated only for non-hierarchical post types.
-			 *
-			 * @since 2.8.0
 			 *
 			 * @param array $actions An array of row action links. Defaults are
 			 *                         'Edit', 'Quick Edit', 'Restore, 'Trash',
