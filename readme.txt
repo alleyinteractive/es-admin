@@ -28,7 +28,7 @@ ES Admin is designed to be able to work with any Elasticsearch index, regardless
 Once you have your adapter, you register it with ES Admin using the `es_admin_adapter` filter. This filter expects a class name in return, which must be an `ES_Admin\Adapters\Adapter` extension. Here's an example using this filter with the SearchPress adapter:
 
 ```php
-add_filter( 'es_admin_adapter', function( $adapter ) {
+add_filter( 'es_admin_adapter', function() {
 	return '\ES_Admin\Adapters\SearchPress';
 } );
 ```
