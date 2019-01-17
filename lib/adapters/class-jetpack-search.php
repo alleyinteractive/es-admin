@@ -90,7 +90,7 @@ class Jetpack_Search extends Adapter {
 	}
 
 	/**
-	 * Filter the ES Admin results so that
+	 * Filter the ES Admin result so it matches what ES Admin expects.
 	 *
 	 * @param array $results Query results.
 	 * @return array
@@ -104,7 +104,9 @@ class Jetpack_Search extends Adapter {
 
 		// Duplicate the fields to _source.
 		foreach ( $results['results']['hits']['hits'] as &$hit ) {
-			$hit['_source'] = $hit['fields'];
+			if ( isset( $hit['fields'] ) ) {	
+				$hit['_source'] = $hit['fields'];
+			}
 		}
 
 		// Return results that are actually a level deep.
