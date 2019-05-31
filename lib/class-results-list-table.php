@@ -8,6 +8,7 @@
 namespace ES_Admin;
 
 use SML;
+use function Network_Media_Library\switch_to_media_site;
 
 if ( ! class_exists( '\WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
@@ -215,10 +216,16 @@ class Results_List_Table extends \WP_List_Table {
 	 * @param \WP_Post $post The current WP_Post object.
 	 */
 	public function column_thumbnail( $post ) {
-		if ( has_post_thumbnail( $post ) ) {
-			echo get_the_post_thumbnail( $post, [ 100, 100 ] );
+		$thumbnail_id = get_post_thumbnail_id( $post );
+		$post_id = $post->ID;
+		if ( $thumbnail_id ) {
+			switch_to_media_site();
+			echo wp_get_attachment_image( $thumbnail_id, [ 100, 100 ] );
+			restore_current_blog();
 		} elseif ( 'attachment' === $post->post_type ) {
-			echo wp_get_attachment_image( $post->ID, [ 100, 100 ] );
+			switch_to_media_site();
+			echo wp_get_attachment_image( $post_id, [ 100, 100 ] );
+			restore_current_blog();
 		}
 	}
 
@@ -463,7 +470,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			$blog_ids = [];
 			foreach ( get_sites() as $site ) {
-				if ( $site->blog_id !== $current_site ) {
+				if ( $site->blog_id !== get_current_blog_id() ) {
 					\switch_to_blog( $site->blog_id );
 					$jetpack_options = get_option( 'jetpack_options' );
 					if ( is_array( $jetpack_options ) ) {
@@ -484,11 +491,11 @@ class Results_List_Table extends \WP_List_Table {
 
 					'159422659' => 1,
 					'162190953' => 2,
+					'162191035' => 3,
 					'162190970' => 4,
 					'162190975' => 5,
 					'162190994' => 7,
 					'162191023' => 9,
-					'162191035' => 11,
 				];
 			}
 
@@ -504,6 +511,28 @@ class Results_List_Table extends \WP_List_Table {
 						"_source": {
 							"post_id": 1898,
 							"blog_id": 159422659
+						}
+					},
+					{
+						"_score": 0.2000000,
+						"fields": {
+							"post_id": 1,
+							"blog_id": 162190953
+						},
+						"_source": {
+							"post_id": 1,
+							"blog_id": 162190953
+						}
+					},
+					{
+						"_score": 0.19,
+						"fields": {
+							"post_id": 70,
+							"blog_id": 162191035
+						},
+						"_source": {
+							"post_id": 70,
+							"blog_id": 162191035
 						}
 					},
 					{
@@ -718,7 +747,8 @@ class Results_List_Table extends \WP_List_Table {
 					}
 				]', true );
 			}
-			$posts = [];
+
+			$post_noids = [];
 			foreach ( $hits as $hit ) {
 			// foreach ( $search->hits() as $hit ) {
 				if ( empty( $hit['_source'][ $es->map_field( 'post_id' ) ] ) ) {
@@ -728,26 +758,15 @@ class Results_List_Table extends \WP_List_Table {
 				$post_id = $hit['_source'][ $es->map_field( 'post_id' ) ];
 				$blog_id = $blog_ids[ $hit['_source']['blog_id'] ];
 
-
-				$switching = ( get_current_blog_id() !== $blog_id );
-
-				if ( $switching ) {
-					\switch_to_blog( $blog_id );
-				}
-				$posts[] = get_post( $post_id );
-
-				if ( $switching ) {
-					\restore_current_blog();
-				}
+				$post_noids[] = $id = SML\Network_Object_ID_Factory::from_current_network( $blog_id, $post_id );
 			}
 
-			$posts = array_filter( $posts );
-
-			if ( empty( $posts ) ) {
+			$post_noids = array_filter( $post_noids );
+			if ( empty( $post_noids ) ) {
 				$this->items = [];
 				return;
 			}
-			$this->items = $posts;
+			$this->items = $post_noids;
 			$this->set_pagination_args( [
 				'total_items' => $search->total(),
 				'per_page'    => $per_page,
@@ -801,6 +820,13 @@ class Results_List_Table extends \WP_List_Table {
 	 * @param  \WP_Post $post The current post object.
 	 */
 	public function single_row( $post ) {
+
+		$switching = ( get_current_blog_id() !== $post->get_site_id() );
+		if ( $switching ) {
+			\switch_to_blog( $post->get_site_id() );
+		}
+		$post = get_post( $post->get_object_id() );
+
 		$post = get_post( $post );
 
 		$GLOBALS['post'] = $post; // WPCS: override ok.
@@ -817,6 +843,9 @@ class Results_List_Table extends \WP_List_Table {
 			<?php $this->single_row_columns( $post ); ?>
 		</tr>
 		<?php
+		if ( $switching ) {
+			\restore_current_blog();
+		}
 	}
 
 	/**
