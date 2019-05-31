@@ -458,7 +458,7 @@ class Results_List_Table extends \WP_List_Table {
 				$this->items = [];
 				return;
 			}
-
+var_dump( $search->hits() );
 			$post_ids = array();
 			foreach ( $search->hits() as $hit ) {
 				if ( empty( $hit['_source'][ $es->map_field( 'post_id' ) ] ) ) {
