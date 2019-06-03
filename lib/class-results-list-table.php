@@ -469,43 +469,16 @@ class Results_List_Table extends \WP_List_Table {
 			}
 
 			$blog_ids = [];
-			foreach ( get_sites() as $site ) {
-				if ( $site->blog_id !== get_current_blog_id() ) {
-					\switch_to_blog( $site->blog_id );
-					$jetpack_options = get_option( 'jetpack_options' );
-					if ( is_array( $jetpack_options ) ) {
-						$jetpack_blog_id = $jetpack_options['id'];
-						if ( null !== $jetpack_blog_id ) {
-							$blog_ids[ $jetpack_blog_id ] = $site->blog_id;
-						}
-					}
-					\restore_current_blog();
-				}
-			}
+			$req = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
+			$response = ( new \SML\REST_Client() )->request_to_data( $req );
 
-			$hits = $search->hits();
-
-			// local testing
-			if ( null === $blog_id ) {
-				$blog_id = '159422659';
+			foreach ( $response as $site ) {
+				$blog_ids[ $site['jetpack_blog_id'] ] = $site['id'];
 			}
-			if ( empty( $blog_ids ) ) {
-				$blog_ids = [
-
-					'159422659' => 1,
-					'162190953' => 2,
-					'162191035' => 3,
-					'162190970' => 4,
-					'162190975' => 5,
-					'162190994' => 7,
-					'162191023' => 9,
-				];
-			}
-			// end local testing
+			$blog_ids = array_filter( $blog_ids );
 
 			$post_noids = [];
-			foreach ( $hits as $hit ) {
-			// foreach ( $search->hits() as $hit ) {
+			foreach ( $search->hits() as $hit ) {
 				if ( empty( $hit['_source'][ $es->map_field( 'post_id' ) ] ) ) {
 					continue;
 				}
@@ -513,7 +486,9 @@ class Results_List_Table extends \WP_List_Table {
 				$post_id = $hit['_source'][ $es->map_field( 'post_id' ) ];
 				$blog_id = $blog_ids[ $hit['_source']['blog_id'] ];
 
-				$post_noids[] = $id = SML\Network_Object_ID_Factory::from_current_network( $blog_id, $post_id );
+				if ( ! is_null ( $blog_id ) ) {
+					$post_noids[] = $id = SML\Network_Object_ID_Factory::from_current_network( $blog_id, $post_id );
+				}
 			}
 
 			$post_noids = array_filter( $post_noids );
