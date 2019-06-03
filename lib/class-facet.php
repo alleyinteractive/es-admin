@@ -188,6 +188,23 @@ class Facet {
 						return $name;
 					}
 					break;
+
+				case 'blog_id':
+
+					$req = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
+					$response = ( new \SML\REST_Client() )->request_to_data( $req );
+
+					foreach ( $response as $site ) {
+						if ( $bucket['key'] === $site['jetpack_blog_id'] ) {
+							$name = $site['name'];
+							break;
+						}
+					}
+
+					if ( $name ) {
+						return $name;
+					}
+					break;
 			}
 
 			return $bucket['key'];
