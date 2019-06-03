@@ -463,12 +463,10 @@ class Results_List_Table extends \WP_List_Table {
 			$search = new Search( $args );
 			$es->set_main_search( $search );
 
-			// local testing
-			// if ( ! $search->has_hits() ) {
-			// 	$this->items = [];
-			// 	return;
-			// }
-			// end local testing
+			if ( ! $search->has_hits() ) {
+				$this->items = [];
+				return;
+			}
 
 			$blog_ids = [];
 			foreach ( get_sites() as $site ) {
@@ -488,7 +486,7 @@ class Results_List_Table extends \WP_List_Table {
 			$hits = $search->hits();
 
 			// local testing
-			if ( '' === $blog_id ) {
+			if ( null === $blog_id ) {
 				$blog_id = '159422659';
 			}
 			if ( empty( $blog_ids ) ) {
@@ -502,254 +500,6 @@ class Results_List_Table extends \WP_List_Table {
 					'162190994' => 7,
 					'162191023' => 9,
 				];
-			}
-
-			if ( empty( $hits ) ) {
-				$hits = json_decode ('[
-					{
-						"_score": 0.21165961,
-						"fields": {
-							"post_id": 1898,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1898,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.2000000,
-						"fields": {
-							"post_id": 1,
-							"blog_id": 162190953
-						},
-						"_source": {
-							"post_id": 1,
-							"blog_id": 162190953
-						}
-					},
-					{
-						"_score": 0.19,
-						"fields": {
-							"post_id": 70,
-							"blog_id": 162191035
-						},
-						"_source": {
-							"post_id": 70,
-							"blog_id": 162191035
-						}
-					},
-					{
-						"_score": 0.18929362,
-						"fields": {
-							"post_id": 79,
-							"blog_id": 162190975
-						},
-						"_source": {
-							"post_id": 79,
-							"blog_id": 162190975
-						}
-					},
-					{
-						"_score": 0.16704905,
-						"fields": {
-							"post_id": 168,
-							"blog_id": 162190970
-						},
-						"_source": {
-							"post_id": 168,
-							"blog_id": 162190970
-						}
-					},
-					{
-						"_score": 0.16333991,
-						"fields": {
-							"post_id": 1537,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1537,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.16333991,
-						"fields": {
-							"post_id": 995,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 995,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.16333991,
-						"fields": {
-							"post_id": 997,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 997,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.14264396,
-						"fields": {
-							"post_id": 2128,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 2128,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.14264396,
-						"fields": {
-							"post_id": 1810,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1810,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.14264396,
-						"fields": {
-							"post_id": 1907,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1907,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.14264396,
-						"fields": {
-							"post_id": 1742,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1742,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.14264396,
-						"fields": {
-							"post_id": 1711,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1711,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.120287105,
-						"fields": {
-							"post_id": 207,
-							"blog_id": 162191035
-						},
-						"_source": {
-							"post_id": 207,
-							"blog_id": 162191035
-						}
-					},
-					{
-						"_score": 0.114613734,
-						"fields": {
-							"post_id": 1377,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1377,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.113457434,
-						"fields": {
-							"post_id": 485,
-							"blog_id": 162191035
-						},
-						"_source": {
-							"post_id": 485,
-							"blog_id": 162191035
-						}
-					},
-					{
-						"_score": 0.09429288,
-						"fields": {
-							"post_id": 113,
-							"blog_id": 162190975
-						},
-						"_source": {
-							"post_id": 113,
-							"blog_id": 162190975
-						}
-					},
-					{
-						"_score": 0.09208456,
-						"fields": {
-							"post_id": 1213,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1213,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.090274915,
-						"fields": {
-							"post_id": 2021,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 2021,
-							"blog_id": 159422659
-						}
-
-					},
-					{
-						"_score": 0.08645363,
-						"fields": {
-							"post_id": 215,
-							"blog_id": 162190970
-						},
-						"_source": {
-							"post_id": 215,
-							"blog_id": 162190970
-						}
-					},
-					{
-						"_score": 0.069383636,
-						"fields": {
-							"post_id": 1702,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 1702,
-							"blog_id": 159422659
-						}
-					},
-					{
-						"_score": 0.032594614,
-						"fields": {
-							"post_id": 2158,
-							"blog_id": 159422659
-						},
-						"_source": {
-							"post_id": 2158,
-							"blog_id": 159422659
-						}
-					}
-				]', true );
 			}
 			// end local testing
 
@@ -767,6 +517,7 @@ class Results_List_Table extends \WP_List_Table {
 			}
 
 			$post_noids = array_filter( $post_noids );
+
 			if ( empty( $post_noids ) ) {
 				$this->items = [];
 				return;
