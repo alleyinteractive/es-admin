@@ -463,10 +463,12 @@ class Results_List_Table extends \WP_List_Table {
 			$search = new Search( $args );
 			$es->set_main_search( $search );
 
+			// local testing
 			// if ( ! $search->has_hits() ) {
 			// 	$this->items = [];
 			// 	return;
 			// }
+			// end local testing
 
 			$blog_ids = [];
 			foreach ( get_sites() as $site ) {
@@ -483,6 +485,9 @@ class Results_List_Table extends \WP_List_Table {
 				}
 			}
 
+			$hits = $search->hits();
+
+			// local testing
 			if ( '' === $blog_id ) {
 				$blog_id = '159422659';
 			}
@@ -499,7 +504,6 @@ class Results_List_Table extends \WP_List_Table {
 				];
 			}
 
-			$hits = $search->hits();
 			if ( empty( $hits ) ) {
 				$hits = json_decode ('[
 					{
@@ -747,6 +751,7 @@ class Results_List_Table extends \WP_List_Table {
 					}
 				]', true );
 			}
+			// end local testing
 
 			$post_noids = [];
 			foreach ( $hits as $hit ) {
