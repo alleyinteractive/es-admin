@@ -40,6 +40,7 @@ class Results_List_Table extends \WP_List_Table {
 	function get_columns() {
 		return [
 			'thumbnail' => _x( 'Image', 'column name', 'es-admin' ),
+			'site'      => _x( 'Site', 'column name', 'es-admin'),
 			'title'     => _x( 'Title', 'column name', 'es-admin' ),
 			'post_type' => __( 'Type', 'es-admin' ),
 			'author'    => _x( 'Author', 'column name', 'es-admin' ),
@@ -237,6 +238,16 @@ class Results_List_Table extends \WP_List_Table {
 	public function column_post_type( $post ) {
 		$post_type_object = get_post_type_object( $post->post_type );
 		echo esc_html( $post_type_object->labels->singular_name );
+	}
+
+	/**
+	 * Handles the site column output.
+	 *
+	 * @param \WP_Post $post The current WP_Post object.
+	 */
+	public function column_site( $post ) {
+		$post_type_object = get_post_type_object( $post->post_type );
+		echo esc_html( get_bloginfo( 'name') );
 	}
 
 	/**
