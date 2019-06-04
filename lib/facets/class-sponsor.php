@@ -1,6 +1,6 @@
 <?php
 /**
- * Post type facet type
+ * Sponsor facet type
  *
  * @package ES Admin
  */
@@ -9,15 +9,22 @@ namespace ES_Admin\Facets;
 use \ES_Admin\DSL as DSL;
 
 /**
- * Post type facet type
+ * Sponsor facet type
  */
-class Post_Type extends Facet_Type {
+class Sponsor extends Facet_Type {
 	/**
 	 * The query var this facet should use.
 	 *
 	 * @var string
 	 */
-	protected $query_var = 'post_type';
+	protected $query_var = 'post_sponsor';
+
+	/**
+	 * The logic mode this facet should use. 'and' or 'or'.
+	 *
+	 * @var string
+	 */
+	protected $logic = 'and';
 
 	/**
 	 * Build the facet request.
@@ -26,9 +33,9 @@ class Post_Type extends Facet_Type {
 	 */
 	public function request() {
 		return [
-			'post_type' => [
+			'meta_post_sponsor' => [
 				'terms' => [
-					'field' => $this->es->map_field( 'post_type' ),
+					'field' => $this->es->map_meta_field( 'post_sponsor', 'post_meta.analyzed' ),
 				],
 			],
 		];
@@ -41,6 +48,6 @@ class Post_Type extends Facet_Type {
 	 * @return array
 	 */
 	public function filter( $values ) {
-		return DSL::terms( $this->es->map_field( 'post_type' ), $values );
+		return DSL::all_terms( $this->es->map_meta_field( 'post_sponsor' ), $values );
 	}
 }

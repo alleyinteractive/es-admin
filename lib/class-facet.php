@@ -135,6 +135,14 @@ class Facet {
 						$this->title = __( 'Author', 'es-admin' );
 						break;
 
+					case 'blog_id':
+						$this->title = __( 'Site', 'es-admin' );
+						break;
+
+					case 'post_status':
+						$this->title = __( 'Status', 'es-admin' );
+						break;
+
 					default:
 						$this->title = $this->label;
 						break;

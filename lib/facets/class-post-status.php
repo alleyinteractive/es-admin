@@ -1,6 +1,6 @@
 <?php
 /**
- * Post type facet type
+ * Post Status facet type
  *
  * @package ES Admin
  */
@@ -9,15 +9,15 @@ namespace ES_Admin\Facets;
 use \ES_Admin\DSL as DSL;
 
 /**
- * Post type facet type
+ * Post Status facet type
  */
-class Post_Type extends Facet_Type {
+class Post_Status extends Facet_Type {
 	/**
 	 * The query var this facet should use.
 	 *
 	 * @var string
 	 */
-	protected $query_var = 'post_type';
+	protected $query_var = 'post_status';
 
 	/**
 	 * Build the facet request.
@@ -26,9 +26,9 @@ class Post_Type extends Facet_Type {
 	 */
 	public function request() {
 		return [
-			'post_type' => [
+			'post_status' => [
 				'terms' => [
-					'field' => $this->es->map_field( 'post_type' ),
+					'field' => $this->es->map_field( 'post_status' ),
 				],
 			],
 		];
@@ -41,6 +41,6 @@ class Post_Type extends Facet_Type {
 	 * @return array
 	 */
 	public function filter( $values ) {
-		return DSL::terms( $this->es->map_field( 'post_type' ), $values );
+		return DSL::terms( $this->es->map_field( 'post_status' ), $values );
 	}
 }
