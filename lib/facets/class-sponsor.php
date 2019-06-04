@@ -35,7 +35,7 @@ class Sponsor extends Facet_Type {
 		return [
 			'meta_post_sponsor' => [
 				'terms' => [
-					'field' => $this->es->map_meta_field( 'post_sponsor', 'post_meta.analyzed' ),
+					'field' => $this->es->map_meta_field( 'post_sponsor', 'post_sponsor' ),
 				],
 			],
 		];
