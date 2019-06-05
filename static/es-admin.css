@@ -24,7 +24,7 @@
 }
 
 #es-admin-facets {
-	width: 250px;
+	width: 150px;
 	padding-right: 15px;
 }
 
@@ -41,16 +41,26 @@
 	margin: 0 0 1em;
 }
 
+.es-admin-site-section-container {
+	float: left;
+}
+
+.es-admin-site-section-container h2 {
+	margin-top: 50px;
+}
+
+.es-admin-site-section-container h3 {
+	margin-top: 0;
+}
+
 .es-admin-site-section {
-	display: flex;
-	flex-direction: row;
+	max-height: 400px;
+	overflow-y: auto;
+	width: 150px;
+	padding-right: 15px;
 }
 
 .es-admin-site-section ol {
 	list-style: none;
 	margin: 0 0 1em;
-}
-
-.es-admin-site-section div {
-	width: 33%;
 }

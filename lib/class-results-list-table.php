@@ -561,30 +561,29 @@ class Results_List_Table extends \WP_List_Table {
 	 *
 	 * @param  \WP_Post $post The current post object.
 	 */
-	public function single_row( $post ) {
-
-		$switching = ( get_current_blog_id() !== $post->get_site_id() );
+	public function single_row( $noid ) {
+		$switching = ( get_current_blog_id() !== $noid->get_site_id() );
 		if ( $switching ) {
-			\switch_to_blog( $post->get_site_id() );
+			\switch_to_blog( $noid->get_site_id() );
 		}
-		$post = get_post( $post->get_object_id() );
+		$post = get_post( $noid->get_object_id() );
 
-		$post = get_post( $post );
+		if ( $post ) {
+			$GLOBALS['post'] = $post; // WPCS: override ok.
+			setup_postdata( $post );
 
-		$GLOBALS['post'] = $post; // WPCS: override ok.
-		setup_postdata( $post );
+			$classes = [];
+			$lock_holder = wp_check_post_lock( $post->ID );
+			if ( $lock_holder ) {
+				$classes[] = 'wp-locked';
+			}
 
-		$classes = [];
-		$lock_holder = wp_check_post_lock( $post->ID );
-		if ( $lock_holder ) {
-			$classes[] = 'wp-locked';
+			?>
+			<tr id="post-<?php echo absint( $post->ID ); ?>" class="<?php echo esc_attr( implode( ' ', get_post_class( $classes, $post->ID ) ) ); ?>">
+				<?php $this->single_row_columns( $post ); ?>
+			</tr>
+			<?php
 		}
-
-		?>
-		<tr id="post-<?php echo absint( $post->ID ); ?>" class="<?php echo esc_attr( implode( ' ', get_post_class( $classes, $post->ID ) ) ); ?>">
-			<?php $this->single_row_columns( $post ); ?>
-		</tr>
-		<?php
 		if ( $switching ) {
 			\restore_current_blog();
 		}

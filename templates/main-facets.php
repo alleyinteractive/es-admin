@@ -21,11 +21,16 @@ if ( ! $search->has_facets() ) {
 		<?php if ( ! empty( $_GET['s'] ) ) : ?>
 			<input type="hidden" name="s" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ); ?>" />
 		<?php endif ?>
-		<?php if ( ! empty( $_GET['additional_blog_ids'] ) ) : ?>
-			<input type="hidden" name="additional_blog_ids[]" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( implode( ',', $_GET['additional_blog_ids'] ) ) ) ); ?>" />
+		<?php if ( ! empty( $additional_blog_ids ) ) : ?>
+			<?php foreach( $additional_blog_ids as $blog_id ) : ?>
+				<input type="hidden" name="additional_blog_ids[]" value="<?php echo esc_attr( $blog_id ); ?>" />
+			<?php endforeach; ?>
 		<?php endif ?>
 		<?php if ( ! empty( $_GET['checkall'] ) ) : ?>
-			<input type="hidden" name="checkall[]" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( implode( ',', $_GET['checkall'] ) ) ) ); ?>" />
+			<?php $checkall = $_GET['checkall']; ?>
+			<?php foreach ( $checkall as $brand ): ?>
+				<input type="hidden" name="checkall[]" value="<?php echo esc_attr( $brand ); ?>" />
+			<?php endforeach; ?>
 		<?php endif ?>
 
 		<h2><?php esc_html_e( 'Filter Results', 'es-admin' ); ?></h2>
