@@ -11,7 +11,7 @@ use SML;
 use function Network_Media_Library\switch_to_media_site;
 
 if ( ! class_exists( '\WP_List_Table' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 /**
@@ -25,11 +25,13 @@ class Results_List_Table extends \WP_List_Table {
 	 * Build the object, setting the defaults.
 	 */
 	function __construct() {
-		parent::__construct( [
-			'singular'  => __( 'result', 'es-admin' ),
-			'plural'    => __( 'results', 'es-admin' ),
-			'ajax'      => true,
-		] );
+		parent::__construct(
+			[
+				'singular' => __( 'result', 'es-admin' ),
+				'plural'   => __( 'results', 'es-admin' ),
+				'ajax'     => true,
+			]
+		);
 	}
 
 	/**
@@ -40,7 +42,7 @@ class Results_List_Table extends \WP_List_Table {
 	function get_columns() {
 		return [
 			'thumbnail' => _x( 'Image', 'column name', 'es-admin' ),
-			'site'      => _x( 'Site', 'column name', 'es-admin'),
+			'site'      => _x( 'Site', 'column name', 'es-admin' ),
 			'title'     => _x( 'Title', 'column name', 'es-admin' ),
 			'post_type' => __( 'Type', 'es-admin' ),
 			'author'    => _x( 'Author', 'column name', 'es-admin' ),
@@ -108,7 +110,7 @@ class Results_List_Table extends \WP_List_Table {
 		}
 
 		$can_edit_post = current_user_can( 'edit_post', $post->ID );
-		$title = _draft_or_post_title();
+		$title         = _draft_or_post_title();
 
 		if ( $can_edit_post && 'trash' !== $post->post_status ) {
 			printf(
@@ -133,7 +135,7 @@ class Results_List_Table extends \WP_List_Table {
 			$lock_holder = wp_check_post_lock( $post->ID );
 
 			if ( $lock_holder ) {
-				$lock_holder = get_userdata( $lock_holder );
+				$lock_holder        = get_userdata( $lock_holder );
 				$locked_avatar_html = get_avatar( $lock_holder->ID, 18 );
 				/* translators: %s: name of editor */
 				$locked_text = sprintf( __( '%s is currently editing', 'es-admin' ), $lock_holder->display_name );
@@ -158,12 +160,12 @@ class Results_List_Table extends \WP_List_Table {
 	 */
 	public function column_date( $post ) {
 		if ( '0000-00-00 00:00:00' === $post->post_date ) {
-			$t_time = $h_time = __( 'Unpublished', 'es-admin' );
+			$t_time    = $h_time = __( 'Unpublished', 'es-admin' );
 			$time_diff = 0;
 		} else {
 			$t_time = get_the_time( __( 'Y/m/d g:i:s a', 'es-admin' ) );
 			$m_time = $post->post_date;
-			$time = get_post_time( 'G', true, $post );
+			$time   = get_post_time( 'G', true, $post );
 
 			$time_diff = time() - $time;
 
@@ -218,7 +220,7 @@ class Results_List_Table extends \WP_List_Table {
 	 */
 	public function column_thumbnail( $post ) {
 		$thumbnail_id = get_post_thumbnail_id( $post );
-		$post_id = $post->ID;
+		$post_id      = $post->ID;
 		if ( $thumbnail_id ) {
 			switch_to_media_site();
 			echo wp_get_attachment_image( $thumbnail_id, [ 100, 100 ] );
@@ -247,7 +249,7 @@ class Results_List_Table extends \WP_List_Table {
 	 */
 	public function column_site( $post ) {
 		$post_type_object = get_post_type_object( $post->post_type );
-		echo esc_html( get_bloginfo( 'name') );
+		echo esc_html( get_bloginfo( 'name' ) );
 	}
 
 	/**
@@ -268,7 +270,7 @@ class Results_List_Table extends \WP_List_Table {
 		}
 		if ( $taxonomy ) {
 			$taxonomy_object = get_taxonomy( $taxonomy );
-			$terms = get_the_terms( $post->ID, $taxonomy );
+			$terms           = get_the_terms( $post->ID, $taxonomy );
 			if ( is_array( $terms ) ) {
 				$out_html = array();
 				foreach ( $terms as $t ) {
@@ -280,10 +282,10 @@ class Results_List_Table extends \WP_List_Table {
 						$posts_in_term_qv[ $taxonomy_object->query_var ] = $t->slug;
 					} else {
 						$posts_in_term_qv['taxonomy'] = $taxonomy;
-						$posts_in_term_qv['term'] = $t->slug;
+						$posts_in_term_qv['term']     = $t->slug;
 					}
 
-					$label = sanitize_term_field( 'name', $t->name, $t->term_id, $taxonomy, 'display' );
+					$label      = sanitize_term_field( 'name', $t->name, $t->term_id, $taxonomy, 'display' );
 					$out_html[] = $this->get_edit_link( $posts_in_term_qv, $label );
 				}
 				/* translators: used between list items, there is a space after the comma */
@@ -343,8 +345,8 @@ class Results_List_Table extends \WP_List_Table {
 	function prepare_items() {
 		$per_page = 20;
 
-		$columns = $this->get_columns();
-		$hidden = array();
+		$columns  = $this->get_columns();
+		$hidden   = array();
 		$sortable = $this->get_sortable_columns();
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
@@ -353,18 +355,18 @@ class Results_List_Table extends \WP_List_Table {
 		// to the url.
 		if ( isset( $_GET['es'] ) && '0' === $_GET['es'] ) {
 			$args = [
-				'post_type' => get_post_types( [ 'public' => true ] ),
-				'post_status' => 'any',
-				'posts_per_page' => $per_page,
-				'paged' => $this->get_pagenum(),
+				'post_type'           => get_post_types( [ 'public' => true ] ),
+				'post_status'         => 'any',
+				'posts_per_page'      => $per_page,
+				'paged'               => $this->get_pagenum(),
 				'ignore_sticky_posts' => true,
-				'perm' => 'readable',
+				'perm'                => 'readable',
 			];
 
 			if ( ! empty( $_GET['s'] ) ) {
-				$args['s'] = sanitize_text_field( wp_unslash( $_GET['s'] ) );
+				$args['s']       = sanitize_text_field( wp_unslash( $_GET['s'] ) );
 				$args['orderby'] = 'relevance';
-				$args['order'] = 'DESC';
+				$args['order']   = 'DESC';
 			}
 
 			if ( ! empty( $_GET['orderby'] ) ) {
@@ -374,41 +376,46 @@ class Results_List_Table extends \WP_List_Table {
 				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
 			}
 
-			$query = new \WP_Query();
+			$query       = new \WP_Query();
 			$this->items = $query->query( $args );
 
-			$this->set_pagination_args( array(
-				'total_items' => $query->found_posts,
-				'per_page'    => $per_page,
-			) );
+			$this->set_pagination_args(
+				array(
+					'total_items' => $query->found_posts,
+					'per_page'    => $per_page,
+				)
+			);
 		} else {
 			$es = ES::instance();
 
 			// Setup base filters.
 			// @todo remove post_types that the current user can't access.
-			$post_types = array_values( get_post_types( [ 'public' => true ] ) );
+			$post_types            = array_values( get_post_types( [ 'public' => true ] ) );
 			$exclude_post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
 
-			$facets = apply_filters( 'es_admin_configured_facets', [
-				new Facets\Post_Type(),
-				new Facets\Category(),
-				new Facets\Tag(),
-				new Facets\Post_Date(),
-			] );
+			$facets = apply_filters(
+				'es_admin_configured_facets',
+				[
+					new Facets\Post_Type(),
+					new Facets\Category(),
+					new Facets\Tag(),
+					new Facets\Post_Date(),
+				]
+			);
 
 			// Build the ES args.
 			$args = [
-				'query' => [
+				'query'   => [
 					'bool' => [
-						'filter' => [ DSL::terms( $es->map_field( 'post_type' ), $post_types ) ],
+						'filter'   => [ DSL::terms( $es->map_field( 'post_type' ), $post_types ) ],
 						'must_not' => DSL::terms( $es->map_field( 'post_status' ), $exclude_post_statuses ),
 					],
 				],
 				'_source' => [
 					'post_id',
 				],
-				'from' => 0,
-				'size' => $per_page,
+				'from'    => 0,
+				'size'    => $per_page,
 			];
 
 			// Build the search query.
@@ -459,7 +466,7 @@ class Results_List_Table extends \WP_List_Table {
 			foreach ( $facets as $facet_type ) {
 				$aggs = array_merge( $aggs, $facet_type->request() );
 				if ( ! empty( $_GET['facets'][ $facet_type->query_var() ] ) ) {
-					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // WPCS: sanitization ok.
+					$values                            = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // WPCS: sanitization ok.
 					$args['query']['bool']['filter'][] = $facet_type->filter( $values );
 				}
 			}
@@ -471,7 +478,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Run the search.
 			$this->items = [];
-			$search = new Search( $args );
+			$search      = new Search( $args );
 			$es->set_main_search( $search );
 
 			if ( ! $search->has_hits() ) {
@@ -480,7 +487,7 @@ class Results_List_Table extends \WP_List_Table {
 			}
 
 			$blog_ids = [];
-			$req = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
+			$req      = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
 			$response = ( new \SML\REST_Client() )->request_to_data( $req );
 
 			foreach ( $response as $site ) {
@@ -497,8 +504,8 @@ class Results_List_Table extends \WP_List_Table {
 				$post_id = $hit['_source'][ $es->map_field( 'post_id' ) ];
 				$blog_id = $blog_ids[ $hit['_source']['blog_id'] ];
 
-				if ( ! is_null ( $blog_id ) ) {
-					$post_noids[] = $id = SML\Network_Object_ID_Factory::from_current_network( $blog_id, $post_id );
+				if ( ! is_null( $blog_id ) ) {
+					$post_noids[] = SML\Network_Object_ID_Factory::from_current_network( $blog_id, $post_id );
 				}
 			}
 
@@ -509,10 +516,12 @@ class Results_List_Table extends \WP_List_Table {
 				return;
 			}
 			$this->items = $post_noids;
-			$this->set_pagination_args( [
-				'total_items' => $search->total(),
-				'per_page'    => $per_page,
-			] );
+			$this->set_pagination_args(
+				[
+					'total_items' => $search->total(),
+					'per_page'    => $per_page,
+				]
+			);
 		}
 	}
 
@@ -559,7 +568,7 @@ class Results_List_Table extends \WP_List_Table {
 	 *
 	 * Sets up postdata and the global post.
 	 *
-	 * @param  \WP_Post $post The current post object.
+	 * @param  \SML\Network_Object_ID $noid The current post network object id.
 	 */
 	public function single_row( $noid ) {
 		$switching = ( get_current_blog_id() !== $noid->get_site_id() );
@@ -572,7 +581,7 @@ class Results_List_Table extends \WP_List_Table {
 			$GLOBALS['post'] = $post; // WPCS: override ok.
 			setup_postdata( $post );
 
-			$classes = [];
+			$classes     = [];
 			$lock_holder = wp_check_post_lock( $post->ID );
 			if ( $lock_holder ) {
 				$classes[] = 'wp-locked';
@@ -603,9 +612,9 @@ class Results_List_Table extends \WP_List_Table {
 		}
 
 		$post_type_object = get_post_type_object( $post->post_type );
-		$can_edit_post = current_user_can( 'edit_post', $post->ID );
-		$actions = array();
-		$title = _draft_or_post_title();
+		$can_edit_post    = current_user_can( 'edit_post', $post->ID );
+		$actions          = array();
+		$title            = _draft_or_post_title();
 
 		if ( $can_edit_post && 'trash' != $post->post_status ) {
 			$actions['edit'] = sprintf(
@@ -649,7 +658,7 @@ class Results_List_Table extends \WP_List_Table {
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ( in_array( $post->post_status, array( 'pending', 'draft', 'future' ) ) ) {
 				if ( $can_edit_post ) {
-					$preview_link = get_preview_post_link( $post );
+					$preview_link    = get_preview_post_link( $post );
 					$actions['view'] = sprintf(
 						'<a href="%s" rel="permalink" aria-label="%s">%s</a>',
 						esc_url( $preview_link ),

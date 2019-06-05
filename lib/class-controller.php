@@ -35,13 +35,13 @@ class Controller {
 		$results = new Results_List_Table();
 		$results->prepare_items();
 
-		include( PATH . '/templates/header.php' );
-		include( PATH . '/templates/search-bar.php' );
+		include PATH . '/templates/header.php';
+		include PATH . '/templates/search-bar.php';
 		if ( ! empty( $_GET['s'] ) ) {
-			include( PATH . '/templates/main-facets.php' );
-			include( PATH . '/templates/main-results.php' );
+			include PATH . '/templates/main-facets.php';
+			include PATH . '/templates/main-results.php';
 		}
-		include( PATH . '/templates/footer.php' );
+		include PATH . '/templates/footer.php';
 	}
 
 	/**

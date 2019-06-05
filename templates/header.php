@@ -6,6 +6,7 @@
  */
 
 namespace ES_Admin;
+
 ?>
 
 <div class="wrap">
@@ -21,4 +22,4 @@ namespace ES_Admin;
 		<?php
 	endif;
 
-/* </div> found in footer.php. */
+	/* </div> found in footer.php. */

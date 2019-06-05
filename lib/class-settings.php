@@ -50,7 +50,7 @@ class Settings {
 	 * Output the es-admin settings screen.
 	 */
 	public function settings_page() {
-		include( PATH . '/templates/settings.php' );
+		include PATH . '/templates/settings.php';
 	}
 
 	/**

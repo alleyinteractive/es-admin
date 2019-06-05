@@ -60,7 +60,7 @@ class Facet {
 	 * @param array  $buckets The buckets/results for the facet.
 	 */
 	public function __construct( $label, $buckets ) {
-		$this->label = $label;
+		$this->label   = $label;
 		$this->buckets = $buckets;
 		$this->parse_type();
 	}
@@ -70,7 +70,7 @@ class Facet {
 	 */
 	protected function parse_type() {
 		if ( 'taxonomy_' === substr( $this->label, 0, 9 ) ) {
-			$this->type = 'taxonomy';
+			$this->type    = 'taxonomy';
 			$this->subtype = $this->query_var = substr( $this->label, 9 );
 		} else {
 			$this->type = $this->query_var = $this->label;
@@ -171,7 +171,7 @@ class Facet {
 			switch ( $this->type ) {
 				case 'taxonomy':
 					$get_term_by = ( function_exists( 'wpcom_vip_get_term_by' ) ? 'wpcom_vip_get_term_by' : 'get_term_by' );
-					$term = call_user_func( $get_term_by, 'slug', $bucket['key'], $this->subtype );
+					$term        = call_user_func( $get_term_by, 'slug', $bucket['key'], $this->subtype );
 					if ( ! empty( $term->name ) ) {
 						return $term->name;
 					}
@@ -198,8 +198,7 @@ class Facet {
 					break;
 
 				case 'blog_id':
-
-					$req = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
+					$req      = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
 					$response = ( new \SML\REST_Client() )->request_to_data( $req );
 
 					foreach ( $response as $site ) {

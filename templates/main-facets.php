@@ -22,13 +22,13 @@ if ( ! $search->has_facets() ) {
 			<input type="hidden" name="s" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ); ?>" />
 		<?php endif ?>
 		<?php if ( ! empty( $additional_blog_ids ) ) : ?>
-			<?php foreach( $additional_blog_ids as $blog_id ) : ?>
+			<?php foreach ( $additional_blog_ids as $blog_id ) : ?>
 				<input type="hidden" name="additional_blog_ids[]" value="<?php echo esc_attr( $blog_id ); ?>" />
 			<?php endforeach; ?>
 		<?php endif ?>
 		<?php if ( ! empty( $_GET['checkall'] ) ) : ?>
 			<?php $checkall = $_GET['checkall']; ?>
-			<?php foreach ( $checkall as $brand ): ?>
+			<?php foreach ( $checkall as $brand ) : ?>
 				<input type="hidden" name="checkall[]" value="<?php echo esc_attr( $brand ); ?>" />
 			<?php endforeach; ?>
 		<?php endif ?>

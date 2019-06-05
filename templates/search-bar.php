@@ -6,6 +6,7 @@
  */
 
 namespace ES_Admin;
+
 ?>
 <form method="get" id="es-admin-search-bar">
 	<div class="es-admin-search-bar-form"
@@ -37,28 +38,31 @@ namespace ES_Admin;
 					}
 				);
 
-				$req = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
+				$req      = new \WP_REST_Request( \WP_REST_Server::READABLE, '/nbc/v1/sites' );
 				$response = ( new \SML\REST_Client() )->request_to_data( $req );
 
 				if ( empty( $additional_blog_ids ) ) {
 					$additional_blog_ids = wp_list_pluck( $response, 'jetpack_blog_id' );
 					$additional_blog_ids = array_diff( $additional_blog_ids, [ $blog_id ] );
-					$checkall = true;
+					$checkall            = true;
 				}
 
 				$brands = [
-					'nbc' => __( 'NBC', 'nbc' ),
+					'nbc'       => __( 'NBC', 'nbc' ),
 					'telemundo' => __( 'Telemundo', 'nbc' ),
 					'microsite' => __( 'Microsites', 'nbc' ),
 				];
-				foreach( $brands as $brand => $brand_name ):
-					$brand_sites = array_filter( $response, function( $site ) use ( $brand ) {
-						return ( $brand === $site['brand'] && $site['id'] !== get_current_blog_id() );
-					});
+				foreach ( $brands as $brand => $brand_name ) :
+					$brand_sites = array_filter(
+						$response,
+						function( $site ) use ( $brand ) {
+							return ( $brand === $site['brand'] && $site['id'] !== get_current_blog_id() );
+						}
+					);
 					if ( $checkall || in_array( $brand, $_GET['checkall'] ) ) {
 						$checked = ' checked="checked"';
 					} else {
-						$checked = "";
+						$checked = '';
 					}
 					echo '<div>';
 					printf(
@@ -67,9 +71,10 @@ namespace ES_Admin;
 						$checked,
 						$brand_name
 					);
-				?>
+					?>
 				<ol>
-					<?php foreach( $brand_sites as $site ) {
+					<?php
+					foreach ( $brand_sites as $site ) {
 						if ( in_array( $site['jetpack_blog_id'], $additional_blog_ids ) ) {
 							$checked = ' checked="checked"';
 						} else {
@@ -79,16 +84,16 @@ namespace ES_Admin;
 						<?php if ( null !== $site['jetpack_blog_id'] ) : ?>
 							<li>
 								<label>
-										<input class="additional_blog_ids <?php echo $brand; ?>" type="checkbox" name="additional_blog_ids[]" value="<?php echo $site['jetpack_blog_id']?>" <?php echo $checked; ?> />
-									<?php echo $site['name']; ?>
+										<input class="additional_blog_ids <?php echo esc_attr( $brand ); ?>" type="checkbox" name="additional_blog_ids[]" value="<?php echo esc_attr( $site['jetpack_blog_id'] ); ?>" <?php echo $checked; ?> />
+									<?php echo esc_html( $site['name'] ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
 					<?php } ?>
 				</ol>
-				<?php
-				echo '</div>';
-				?>
+					<?php
+					echo '</div>';
+					?>
 				<?php endforeach; ?>
 		</div>
 	</div>

@@ -42,13 +42,13 @@ if ( is_admin() ) {
 	define( __NAMESPACE__ . '\URL', trailingslashit( plugins_url( '', __FILE__ ) ) );
 
 	// Custom autoloader.
-	require_once( PATH . '/lib/autoload.php' );
+	require_once PATH . '/lib/autoload.php';
 
 	// Singleton trait.
-	require_once( PATH . '/lib/trait-singleton.php' );
+	require_once PATH . '/lib/trait-singleton.php';
 
 	// Assorted Functions.
-	require_once( PATH . '/lib/functions.php' );
+	require_once PATH . '/lib/functions.php';
 
 	// Load the main controller class.
 	add_action( 'after_setup_theme', [ '\ES_Admin\Controller', 'instance' ] );
