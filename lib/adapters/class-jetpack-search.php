@@ -123,6 +123,7 @@ class Jetpack_Search extends Adapter {
 		if ( class_exists( '\Jetpack_Search' ) ) {
 			$jetpack_search = \Jetpack_Search::instance();
 			if ( method_exists( $jetpack_search, 'search' ) ) {
+				$es_args = apply_filters( 'jetpack_search_es_query_args', $es_args, $this );
 				return $jetpack_search->search( $es_args );
 			}
 		}
