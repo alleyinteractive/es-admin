@@ -123,6 +123,18 @@ class Jetpack_Search extends Adapter {
 		if ( class_exists( '\Jetpack_Search' ) ) {
 			$jetpack_search = \Jetpack_Search::instance();
 			if ( method_exists( $jetpack_search, 'search' ) ) {
+				/**
+				 * Modify the underlying ES query that is passed to the search endpoint.
+				 * The returned args must represent a valid ES query (ES DSL). This
+				 * filter mimics the `jetpack_search_es_query_args` filter.
+				 *
+				 * This filter is hard to use if you're unfamiliar with ES, but allows
+				 * complete control over the query.
+				 *
+				 * @param array $es_args The raw Elasticsearch query args (DSL).
+				 * @return array Elasticsearch DSL.
+				 */
+				$es_args = apply_filters( 'es_admin_jp_es_query_args', $es_args );
 				return $jetpack_search->search( $es_args );
 			}
 		}
