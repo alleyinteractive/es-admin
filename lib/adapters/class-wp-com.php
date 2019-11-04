@@ -116,6 +116,9 @@ class WP_Com extends Adapter {
 			$es_args = apply_filters( 'es_admin_wp_com_es_args', $es_args );
 
 			$response = es_api_search_index( $es_args, 'es-admin' );
+			if ( is_wp_error( $response ) ) {
+				return $es_args['name'];
+			}
 
 			// Normalize response (ES is hits.hits, wpcom is results.hits; ES is
 			// aggregations, wpcom is results.aggregations).
