@@ -63,7 +63,7 @@ class Search {
 	 */
 	protected function query() {
 		$this->results = ES::instance()->query( $this->es_args );
-		$this->results = apply_filters( 'es_admin_results', $this->results );
+		$this->results = apply_filters( 'es_admin_results', $this->results, $this->es_args );
 		$this->parse_hits();
 		$this->parse_total();
 		$this->parse_facets();
@@ -73,7 +73,7 @@ class Search {
 	 * Pull the hits out of the ES response.
 	 */
 	protected function parse_hits() {
-		$this->hits = apply_filters( 'es_admin_parse_hits', [] );
+		$this->hits = apply_filters( 'es_admin_parse_hits', [], $this->results, $this->es_args );
 		if ( empty( $this->hits ) ) {
 			if ( ! empty( $this->results['hits']['hits'] ) ) {
 				$this->hits = $this->results['hits']['hits'];
@@ -85,7 +85,7 @@ class Search {
 	 * Pull the total out of the ES response.
 	 */
 	protected function parse_total() {
-		$this->total = apply_filters( 'es_admin_parse_total', null );
+		$this->total = apply_filters( 'es_admin_parse_total', null, $this->results, $this->es_args );
 		if ( ! isset( $this->total ) ) {
 			// Using isset because 0 is empty but valid.
 			if ( isset( $this->results['hits']['total'] ) ) {
@@ -98,7 +98,7 @@ class Search {
 	 * Pull the facets out of the ES response.
 	 */
 	protected function parse_facets() {
-		$this->facets = apply_filters( 'es_admin_parse_facets', [] );
+		$this->facets = apply_filters( 'es_admin_parse_facets', [], $this->results, $this->es_args );
 		if ( empty( $this->facets ) ) {
 			if ( ! empty( $this->results['aggregations'] ) ) {
 				foreach ( $this->results['aggregations'] as $label => $buckets ) {

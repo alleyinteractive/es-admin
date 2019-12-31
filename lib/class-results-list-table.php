@@ -364,11 +364,6 @@ class Results_List_Table extends \WP_List_Table {
 		} else {
 			$es = ES::instance();
 
-			// Setup base filters.
-			// @todo remove post_types that the current user can't access.
-			$post_types = array_values( get_post_types( [ 'public' => true ] ) );
-			$exclude_post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
-
 			$facets = apply_filters( 'es_admin_configured_facets', [
 				new Facets\Post_Type(),
 				new Facets\Category(),
@@ -378,12 +373,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Build the ES args.
 			$args = [
-				'query' => [
-					'bool' => [
-						'filter' => [ DSL::terms( $es->map_field( 'post_type' ), $post_types ) ],
-						'must_not' => DSL::terms( $es->map_field( 'post_status' ), $exclude_post_statuses ),
-					],
-				],
+				'query' => [],
 				'_source' => [
 					'post_id',
 				],
@@ -451,6 +441,13 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Run the search.
 			$this->items = [];
+
+			/**
+			 * Filter the search page's query DSL before sending to ES.
+			 *
+			 * @param array $args ES Query DSL, as a PHP array.
+			 */
+			$args = apply_filters( 'es_admin_search_page_query_dsl', $args );
 			$search = new Search( $args );
 			$es->set_main_search( $search );
 

@@ -7,7 +7,9 @@
 
 namespace ES_Admin;
 
-function es_admin_verify_es_is_running( $tries = 5, $sleep = 3 ) {
+class ES_Index_Exception extends \Exception {}
+
+function verify_es_is_running( $tries = 5, $sleep = 3 ) {
 	// Make sure ES is running and responding
 	do {
 		$response = wp_remote_get( 'http://localhost:9200/' );
@@ -34,7 +36,7 @@ function es_admin_verify_es_is_running( $tries = 5, $sleep = 3 ) {
 	return travis_es_verify_response_code( $response );
 }
 
-function es_admin_index_test_data() {
+function index_test_data() {
 	// Ensure the index is empty
 	wp_remote_request( 'http://localhost:9200/es-admin-unit-tests/', array( 'method' => 'DELETE' ) );
 

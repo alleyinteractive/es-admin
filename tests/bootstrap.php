@@ -5,9 +5,16 @@
  * @package ES Admin
  */
 
+define( 'ES_ADMIN_TEST_ENV', true );
+
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 if ( ! $_tests_dir ) {
 	$_tests_dir = '/tmp/wordpress-tests-lib';
+}
+
+$_es_version = getenv( 'ES_VERSION' );
+if ( ! defined( 'ES_VERSION' ) && $_es_version ) {
+	define( 'ES_VERSION', $_es_version );
 }
 
 // Give access to tests_add_filter() function.
@@ -25,6 +32,15 @@ function _manually_load_plugin() {
 	if ( apply_filters( 'es_admin_phpunit_use_default_integration', true ) ) {
 		require_once( __DIR__ . '/es.php' );
 	}
+
+	if ( ! \ES_Admin\verify_es_is_running() ) {
+		echo "\n\nFatal: bootstrap check failed!\n";
+		exit( 1 );
+	}
+
+	add_filter( 'es_admin_adapter', function( $adapter ) {
+		return 'ES_Admin\Adapters\Generic';
+	} );
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
@@ -42,3 +58,6 @@ tests_add_filter( 'es_admin_adapter', '_es_admin_phpunit_adapter' );
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
+
+// Load Test Case class.
+require_once __DIR__ . '/class-es-admin-test-case.php';

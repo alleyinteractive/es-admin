@@ -29,11 +29,14 @@ class Settings {
 
 	/**
 	 * Build the singleton.
+	 *
+	 * @param bool $force_load Mainly used for testing, if true the ES_WP_Query
+	 *                         check will be skipped.
 	 */
-	public function setup() {
+	public function setup( $force_load = false ) {
 		// All settings currently require ES_WP_Query, so we need it to be
 		// present. In the future, this will likely change.
-		if ( class_exists( 'ES_WP_Query' ) ) {
+		if ( class_exists( '\ES_WP_Query' ) || $force_load ) {
 			add_action( 'admin_menu', [ $this, 'add_settings_page' ] );
 			add_action( 'admin_post_es_admin_settings', [ $this, 'process_form' ] );
 		}

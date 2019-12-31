@@ -51,11 +51,9 @@ class DSL {
 	 * @return array DSL fragment.
 	 */
 	public static function terms( $field, $values, $args = [] ) {
-		$type = is_array( $values ) ? 'terms' : 'term';
-
 		return [
-			$type => array_merge( [
-				$field => $values,
+			'terms' => array_merge( [
+				$field => (array) $values,
 			], $args ),
 		];
 	}
