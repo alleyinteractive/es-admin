@@ -18,7 +18,7 @@ class Integration {
 	 */
 	public function setup() {
 		if ( $this->is_active() ) {
-			add_action( 'ajax_query_attachments_args', [ $this, 'query_attachments' ] );
+			add_filter( 'ajax_query_attachments_args', [ $this, 'query_attachments' ] );
 			add_filter( 'pre_get_posts', [ $this, 'main_search' ] );
 		}
 	}
