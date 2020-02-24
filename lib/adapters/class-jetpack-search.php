@@ -1,6 +1,6 @@
 <?php
 /**
- * WordPress.com adapter.
+ * Jetpack Search adapter.
  *
  * @package ES Admin
  */
@@ -8,16 +8,20 @@
 namespace ES_Admin\Adapters;
 
 /**
- * An adapter for WordPress.com VIP.
+ * An adapter for Jetpack Search.
  */
-class WP_Com extends Adapter {
+class Jetpack_Search extends Adapter {
 
 	/**
 	 * Build the object and set the field map.
 	 */
 	public function __construct() {
+
+		// Modify the response so it's in a format ES Admin understands.
+		add_filter( 'es_admin_results', [ $this, 'filter_es_admin_results' ] );
+
 		$this->field_map['post_author']                   = 'author_id';
-		$this->field_map['post_author.display_name']      = 'author';
+		$this->field_map['post_author.user_nicename']     = 'author_login';
 		$this->field_map['post_date']                     = 'date';
 		$this->field_map['post_date.year']                = 'date_token.year';
 		$this->field_map['post_date.month']               = 'date_token.month';
@@ -43,8 +47,8 @@ class WP_Com extends Adapter {
 		$this->field_map['post_title']                    = 'title';
 		$this->field_map['post_title.analyzed']           = 'title';
 		$this->field_map['post_excerpt']                  = 'excerpt';
-		$this->field_map['post_password']                 = 'post_password';  // this isn't indexed on wordpress.com.
-		$this->field_map['post_name']                     = 'post_name';      // this isn't indexed on wordpress.com.
+		$this->field_map['post_password']                 = 'post_password';  // This isn't indexed on VIP.
+		$this->field_map['post_name']                     = 'post_name';      // This isn't indexed on VIP.
 		$this->field_map['post_modified']                 = 'modified';
 		$this->field_map['post_modified.year']            = 'modified_token.year';
 		$this->field_map['post_modified.month']           = 'modified_token.month';
@@ -66,9 +70,9 @@ class WP_Com extends Adapter {
 		$this->field_map['post_modified_gmt.minute']      = 'modified_gmt_token.minute';
 		$this->field_map['post_modified_gmt.second']      = 'modified_gmt_token.second';
 		$this->field_map['post_parent']                   = 'parent_post_id';
-		$this->field_map['menu_order']                    = 'menu_order';     // this isn't indexed on wordpress.com.
-		$this->field_map['post_mime_type']                = 'post_mime_type'; // this isn't indexed on wordpress.com.
-		$this->field_map['comment_count']                 = 'comment_count';  // this isn't indexed on wordpress.com.
+		$this->field_map['menu_order']                    = 'menu_order';     // This isn't indexed on VIP.
+		$this->field_map['post_mime_type']                = 'post_mime_type'; // This isn't indexed on VIP.
+		$this->field_map['comment_count']                 = 'comment_count';  // This isn't indexed on VIP.
 		$this->field_map['post_meta']                     = 'meta.%s.value.raw_lc';
 		$this->field_map['post_meta.analyzed']            = 'meta.%s.value';
 		$this->field_map['post_meta.long']                = 'meta.%s.long';
@@ -77,61 +81,63 @@ class WP_Com extends Adapter {
 		$this->field_map['term_id']                       = 'taxonomy.%s.term_id';
 		$this->field_map['term_slug']                     = 'taxonomy.%s.slug';
 		$this->field_map['term_name']                     = 'taxonomy.%s.name.raw_lc';
-		$this->field_map['term_name.analyzed']            = 'taxonomy.%s.name';
 		$this->field_map['category_id']                   = 'category.term_id';
 		$this->field_map['category_slug']                 = 'category.slug';
-		$this->field_map['category_name']                 = 'category.name.raw_lc';
-		$this->field_map['category_name.analyzed']        = 'category.name';
+		$this->field_map['category_name']                 = 'category.name.raw';
 		$this->field_map['tag_id']                        = 'tag.term_id';
 		$this->field_map['tag_slug']                      = 'tag.slug';
-		$this->field_map['tag_name']                      = 'tag.name.raw_lc';
-		$this->field_map['tag_name.analyzed']             = 'tag.name';
+		$this->field_map['tag_name']                      = 'tag.name.raw';
+	}
+
+	/**
+	 * Filter the ES Admin result so it matches what ES Admin expects.
+	 *
+	 * @param array $results Query results.
+	 * @return array
+	 */
+	public function filter_es_admin_results( $results ) {
+
+		// Nest the hits one more level.
+		$results['results']['hits'] = [
+			'hits' => $results['results']['hits'],
+		];
+
+		// Duplicate the fields to _source.
+		foreach ( $results['results']['hits']['hits'] as &$hit ) {
+			if ( isset( $hit['fields'] ) && empty( $hit['_source'] ) ) {	
+				$hit['_source'] = $hit['fields'];
+			}
+		}
+
+		// Return results that are actually a level deep.
+		return $results['results'];
 	}
 
 	/**
 	 * Run a query against the ES index.
 	 *
-	 * @param  array $es_args Elasticsearch DSL as a PHP array.
+	 * @param array $es_args Elasticsearch DSL as a PHP array.
 	 * @return array Elasticsearch response as a PHP array.
 	 */
 	public function query( $es_args ) {
-		if ( function_exists( 'es_api_search_index' ) ) {
-			if ( ! empty( $es_args['blog_id'] ) ) {
-				$blog_id = absint( $es_args['blog_id'] );
-				unset( $es_args['blog_id'] );
-			} else {
-				$blog_id = get_current_blog_id();
+		if ( class_exists( '\Jetpack_Search' ) ) {
+			$jetpack_search = \Jetpack_Search::instance();
+			if ( method_exists( $jetpack_search, 'search' ) ) {
+				/**
+				 * Modify the underlying ES query that is passed to the search endpoint.
+				 * The returned args must represent a valid ES query (ES DSL). This
+				 * filter mimics the `jetpack_search_es_query_args` filter.
+				 *
+				 * This filter is hard to use if you're unfamiliar with ES, but allows
+				 * complete control over the query.
+				 *
+				 * @param array $es_args The raw Elasticsearch query args (DSL).
+				 * @return array Elasticsearch DSL.
+				 */
+				$es_args = apply_filters( 'es_admin_jp_es_query_args', $es_args );
+				return $jetpack_search->search( $es_args );
 			}
-
-			$es_args['name'] = es_api_get_index_name_by_blog_id( $blog_id );
-			if ( is_wp_error( $es_args['name'] ) ) {
-				return array();
-			}
-
-			/**
-			 * Filter the ES args once more, after the site name has been set.
-			 *
-			 * @var array Elasticsearch DSL query as a PHP array.
-			 */
-			$es_args = apply_filters( 'es_admin_wp_com_es_args', $es_args );
-
-			$response = es_api_search_index( $es_args, 'es-admin' );
-			if ( is_wp_error( $response ) ) {
-				return array();
-			}
-
-			// Normalize response (ES is hits.hits, wpcom is results.hits; ES is
-			// aggregations, wpcom is results.aggregations).
-			if ( isset( $response['results'] ) ) {
-				$response['hits'] = $response['results'];
-				unset( $response['results'] );
-				if ( isset( $response['hits']['aggregations'] ) ) {
-					$response['aggregations'] = $response['hits']['aggregations'];
-					unset( $response['hits']['aggregations'] );
-				}
-			}
-
-			return $response;
 		}
+		return [];
 	}
 }
