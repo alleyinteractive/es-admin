@@ -89,8 +89,10 @@ class Search {
 		if ( ! isset( $this->total ) ) {
 			// Using isset because 0 is empty but valid.
 			if ( isset( $this->results['hits']['total']['value'] ) ) {
+				// ES Versions 7+ updated hits.total to an object.
 				$this->total = absint( $this->results['hits']['total']['value'] );
 			} elseif ( isset( $es_response['hits']['total'] ) ) {
+				// ES Versions up to 6.x
 				$this->total = absint( $this->results['hits']['total'] );
 			}
 		}
