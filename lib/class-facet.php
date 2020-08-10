@@ -60,7 +60,7 @@ class Facet {
 	 * @param array  $buckets The buckets/results for the facet.
 	 */
 	public function __construct( $label, $buckets ) {
-		$this->label = $label;
+		$this->label   = $label;
 		$this->buckets = $buckets;
 		$this->parse_type();
 	}
@@ -70,7 +70,7 @@ class Facet {
 	 */
 	protected function parse_type() {
 		if ( 'taxonomy_' === substr( $this->label, 0, 9 ) ) {
-			$this->type = 'taxonomy';
+			$this->type    = 'taxonomy';
 			$this->subtype = $this->query_var = substr( $this->label, 9 );
 		} else {
 			$this->type = $this->query_var = $this->label;
@@ -163,7 +163,7 @@ class Facet {
 			switch ( $this->type ) {
 				case 'taxonomy':
 					$get_term_by = ( function_exists( 'wpcom_vip_get_term_by' ) ? 'wpcom_vip_get_term_by' : 'get_term_by' );
-					$term = call_user_func( $get_term_by, 'slug', $bucket['key'], $this->subtype );
+					$term        = call_user_func( $get_term_by, 'slug', $bucket['key'], $this->subtype );
 					if ( ! empty( $term->name ) ) {
 						return $term->name;
 					}
@@ -178,7 +178,7 @@ class Facet {
 
 				case 'post_date':
 					if ( is_numeric( $bucket['key'] ) ) {
-						return date( 'Y-m-d', absint( $bucket['key'] ) / 1000 );
+						return date( 'Y-m-d', absint( $bucket['key'] ) / 1000 ); //phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
 					}
 					break;
 
@@ -217,7 +217,7 @@ class Facet {
 		if ( 'post_date' === $this->type ) {
 			$value = absint( $value ) / 1000;
 		}
-		$values = ! empty( $_GET['facets'][ $this->query_var ] ) ? (array) $_GET['facets'][ $this->query_var ] : []; // WPCS: sanitization ok.
-		checked( in_array( $value, $values ) );
+		$values = ! empty( $_GET['facets'][ $this->query_var ] ) ? (array) $_GET['facets'][ $this->query_var ] : []; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		checked( in_array( $value, $values ) ); // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 	}
 }

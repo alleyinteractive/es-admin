@@ -69,7 +69,7 @@ class Integration {
 			$query->set( 'es', true );
 
 			// Maybe add 'public' to the post status list.
-			if ( in_array( 'attachment', (array) $query->get( 'post_type' ) ) ) {
+			if ( in_array( 'attachment', (array) $query->get( 'post_type' ), true ) ) {
 				$post_status = $query->get( 'post_status' );
 				if ( ! empty( $post_status ) ) {
 					$query->set( 'post_status', $this->attachments_post_status( $post_status ) );

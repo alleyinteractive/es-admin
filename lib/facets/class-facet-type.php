@@ -6,6 +6,7 @@
  */
 
 namespace ES_Admin\Facets;
+
 use \ES_Admin\ES as ES;
 
 /**

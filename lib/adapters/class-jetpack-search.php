@@ -104,7 +104,7 @@ class Jetpack_Search extends Adapter {
 
 		// Duplicate the fields to _source.
 		foreach ( $results['results']['hits']['hits'] as &$hit ) {
-			if ( isset( $hit['fields'] ) && empty( $hit['_source'] ) ) {	
+			if ( isset( $hit['fields'] ) && empty( $hit['_source'] ) ) {
 				$hit['_source'] = $hit['fields'];
 			}
 		}

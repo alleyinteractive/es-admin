@@ -78,9 +78,9 @@ class ES {
 	 * @return string The mapped field.
 	 */
 	public function map_tax_field( $taxonomy, $field ) {
-		if ( 'post_tag' == $taxonomy ) {
+		if ( 'post_tag' === $taxonomy ) {
 			$field = str_replace( 'term_', 'tag_', $field );
-		} elseif ( 'category' == $taxonomy ) {
+		} elseif ( 'category' === $taxonomy ) {
 			$field = str_replace( 'term_', 'category_', $field );
 		}
 		return sprintf( $this->map_field( $field ), $taxonomy );

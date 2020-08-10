@@ -9,7 +9,7 @@
 <div class="wrap">
 	<h1><?php esc_html_e( 'Admin Search Settings', 'es-admin' ); ?></h1>
 
-	<?php if ( ! empty( $_GET['saved'] ) ) : ?>
+	<?php if ( ! empty( $_GET['saved'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 		<div id="message" class="updated notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings Updated', 'es-admin' ); ?></p></div>
 	<?php endif ?>
 

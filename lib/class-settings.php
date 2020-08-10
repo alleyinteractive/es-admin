@@ -50,7 +50,7 @@ class Settings {
 	 * Output the es-admin settings screen.
 	 */
 	public function settings_page() {
-		include( PATH . '/templates/settings.php' );
+		include PATH . '/templates/settings.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
 	}
 
 	/**
@@ -86,7 +86,7 @@ class Settings {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'es-admin' ) );
 		}
 
-		if ( ! isset( $_POST['es_admin_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['es_admin_nonce'] ), 'es_admin_settings' ) ) { // wpcs: sanitization ok.
+		if ( ! isset( $_POST['es_admin_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['es_admin_nonce'] ), 'es_admin_settings' ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_die( esc_html__( 'You are not authorized to perform that action', 'es-admin' ) );
 		}
 

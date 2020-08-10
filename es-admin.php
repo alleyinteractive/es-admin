@@ -38,17 +38,17 @@
 namespace ES_Admin;
 
 if ( is_admin() ) {
-	define( __NAMESPACE__ . '\PATH', __DIR__ );
-	define( __NAMESPACE__ . '\URL', trailingslashit( plugins_url( '', __FILE__ ) ) );
+	define( __NAMESPACE__ . '\PATH', __DIR__ ); // phpcs:ignore WordPressVIPMinimum.Constants.ConstantString.NotCheckingConstantName
+	define( __NAMESPACE__ . '\URL', trailingslashit( plugins_url( '', __FILE__ ) ) ); // phpcs:ignore WordPressVIPMinimum.Constants.ConstantString.NotCheckingConstantName
 
 	// Custom autoloader.
-	require_once( PATH . '/lib/autoload.php' );
+	require_once PATH . '/lib/autoload.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
 
 	// Singleton trait.
-	require_once( PATH . '/lib/trait-singleton.php' );
+	require_once PATH . '/lib/trait-singleton.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
 
 	// Assorted Functions.
-	require_once( PATH . '/lib/functions.php' );
+	require_once PATH . '/lib/functions.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
 
 	// Load the main controller class.
 	add_action( 'after_setup_theme', [ '\ES_Admin\Controller', 'instance' ] );

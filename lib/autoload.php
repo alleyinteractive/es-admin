@@ -18,10 +18,10 @@ function autoload( $cls ) {
 		return;
 	}
 
-	$cls = strtolower( str_replace( [ 'ES_Admin\\', '_' ], [ '', '-' ], $cls ) );
+	$cls  = strtolower( str_replace( [ 'ES_Admin\\', '_' ], [ '', '-' ], $cls ) );
 	$dirs = explode( '\\', $cls );
-	$cls = array_pop( $dirs );
+	$cls  = array_pop( $dirs );
 
-	require_once( PATH . rtrim( '/lib/' . implode( '/', $dirs ), '/' ) . '/class-' . $cls . '.php' );
+	require_once PATH . rtrim( '/lib/' . implode( '/', $dirs ), '/' ) . '/class-' . $cls . '.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
 }
 spl_autoload_register( '\ES_Admin\autoload' );

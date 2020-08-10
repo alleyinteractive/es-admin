@@ -35,20 +35,20 @@ class Controller {
 		$results = new Results_List_Table();
 		$results->prepare_items();
 
-		include( PATH . '/templates/header.php' );
-		include( PATH . '/templates/search-bar.php' );
-		if ( ! empty( $_GET['s'] ) ) {
-			include( PATH . '/templates/main-facets.php' );
-			include( PATH . '/templates/main-results.php' );
+		include PATH . '/templates/header.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
+		include PATH . '/templates/search-bar.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
+		if ( ! empty( $_GET['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			include PATH . '/templates/main-facets.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
+			include PATH . '/templates/main-results.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
 		}
-		include( PATH . '/templates/footer.php' );
+		include PATH . '/templates/footer.php'; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingCustomConstant
 	}
 
 	/**
 	 * Load custom CSS and JS files for the page.
 	 */
 	public function assets() {
-		wp_enqueue_style( 'es-admin-css', URL . '/static/es-admin.css', [ 'buttons' ], '0.1' );
-		wp_enqueue_script( 'es-admin-js', URL . '/static/es-admin.js', [ 'jquery' ], '0.1' );
+		wp_enqueue_style( 'es-admin-css', URL . '/static/es-admin.css', [ 'buttons' ], '0.1', true );
+		wp_enqueue_script( 'es-admin-js', URL . '/static/es-admin.js', [ 'jquery' ], '0.1', true );
 	}
 }
