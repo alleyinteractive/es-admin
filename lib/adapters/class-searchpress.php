@@ -45,6 +45,6 @@ class SearchPress extends Adapter {
 	 * @return array Elasticsearch response as a PHP array.
 	 */
 	public function query( $es_args ) {
-		return SP_API()->search( json_encode( $es_args ), [ 'output' => ARRAY_A ] );
+		return SP_API()->search( wp_json_encode( $es_args ), [ 'output' => ARRAY_A ] );
 	}
 }

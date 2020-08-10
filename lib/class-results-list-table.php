@@ -8,7 +8,7 @@
 namespace ES_Admin;
 
 if ( ! class_exists( '\WP_List_Table' ) ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 /**
@@ -21,11 +21,11 @@ class Results_List_Table extends \WP_List_Table {
 	/**
 	 * Build the object, setting the defaults.
 	 */
-	function __construct() {
+	public function __construct() {
 		parent::__construct( [
-			'singular'  => __( 'result', 'es-admin' ),
-			'plural'    => __( 'results', 'es-admin' ),
-			'ajax'      => true,
+			'singular' => __( 'result', 'es-admin' ),
+			'plural'   => __( 'results', 'es-admin' ),
+			'ajax'     => true,
 		] );
 	}
 
@@ -34,7 +34,7 @@ class Results_List_Table extends \WP_List_Table {
 	 *
 	 * @return array
 	 */
-	function get_columns() {
+	public function get_columns() {
 		return [
 			'thumbnail' => _x( 'Image', 'column name', 'es-admin' ),
 			'title'     => _x( 'Title', 'column name', 'es-admin' ),
@@ -75,10 +75,10 @@ class Results_List_Table extends \WP_List_Table {
 	 * @param string   $data The data attributes for the <td> element.
 	 * @param string   $primary The primary column.
 	 */
-	protected function _column_title( $post, $classes, $data, $primary ) {
+	protected function _column_title( $post, $classes, $data, $primary ) { // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
 		echo '<td class="' . esc_attr( $classes ) . ' page-title" ' . esc_html( $data ) . '>';
-		echo $this->column_title( $post ); // WPCS: XSS ok.
-		echo $this->handle_row_actions( $post, 'title', $primary ); // WPCS: XSS ok.
+		echo $this->column_title( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $this->handle_row_actions( $post, 'title', $primary ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '</td>';
 	}
 
@@ -104,7 +104,7 @@ class Results_List_Table extends \WP_List_Table {
 		}
 
 		$can_edit_post = current_user_can( 'edit_post', $post->ID );
-		$title = _draft_or_post_title();
+		$title         = _draft_or_post_title();
 
 		if ( $can_edit_post && 'trash' !== $post->post_status ) {
 			printf(
@@ -119,9 +119,9 @@ class Results_List_Table extends \WP_List_Table {
 		}
 		_post_states( $post );
 
-		if ( isset( $parent_name ) ) {
+		if ( isset( $parent_name ) ) { //phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UndefinedVariable
 			$post_type_object = get_post_type_object( $post->post_type );
-			echo esc_html( ' | ' . $post_type_object->labels->parent_item_colon . ' ' . $parent_name );
+			echo esc_html( ' | ' . $post_type_object->labels->parent_item_colon . ' ' . $parent_name ); // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.UndefinedVariable
 		}
 		echo "</strong>\n";
 
@@ -129,7 +129,7 @@ class Results_List_Table extends \WP_List_Table {
 			$lock_holder = wp_check_post_lock( $post->ID );
 
 			if ( $lock_holder ) {
-				$lock_holder = get_userdata( $lock_holder );
+				$lock_holder        = get_userdata( $lock_holder );
 				$locked_avatar_html = get_avatar( $lock_holder->ID, 18 );
 				/* translators: %s: name of editor */
 				$locked_text = sprintf( __( '%s is currently editing', 'es-admin' ), $lock_holder->display_name );
@@ -137,8 +137,8 @@ class Results_List_Table extends \WP_List_Table {
 				$locked_avatar_html = $locked_text = '';
 			}
 
-			echo '<div class="locked-info"><span class="locked-avatar">' . // WPCS: XSS ok.
-				$locked_avatar_html .
+			echo '<div class="locked-info"><span class="locked-avatar">' . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				$locked_avatar_html . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				'</span> <span class="locked-text">' .
 				esc_html( $locked_text ) .
 				"</span></div>\n";
@@ -155,11 +155,12 @@ class Results_List_Table extends \WP_List_Table {
 	public function column_date( $post ) {
 		if ( '0000-00-00 00:00:00' === $post->post_date ) {
 			$t_time = $h_time = __( 'Unpublished', 'es-admin' );
+
 			$time_diff = 0;
 		} else {
 			$t_time = get_the_time( __( 'Y/m/d g:i:s a', 'es-admin' ) );
 			$m_time = $post->post_date;
-			$time = get_post_time( 'G', true, $post );
+			$time   = get_post_time( 'G', true, $post );
 
 			$time_diff = time() - $time;
 
@@ -248,26 +249,26 @@ class Results_List_Table extends \WP_List_Table {
 		}
 		if ( $taxonomy ) {
 			$taxonomy_object = get_taxonomy( $taxonomy );
-			$terms = get_the_terms( $post->ID, $taxonomy );
+			$terms           = get_the_terms( $post->ID, $taxonomy );
 			if ( is_array( $terms ) ) {
 				$out_html = array();
 				foreach ( $terms as $t ) {
 					$posts_in_term_qv = array();
-					if ( 'post' != $post->post_type ) {
+					if ( 'post' !== $post->post_type ) {
 						$posts_in_term_qv['post_type'] = $post->post_type;
 					}
 					if ( $taxonomy_object->query_var ) {
 						$posts_in_term_qv[ $taxonomy_object->query_var ] = $t->slug;
 					} else {
 						$posts_in_term_qv['taxonomy'] = $taxonomy;
-						$posts_in_term_qv['term'] = $t->slug;
+						$posts_in_term_qv['term']     = $t->slug;
 					}
 
-					$label = sanitize_term_field( 'name', $t->name, $t->term_id, $taxonomy, 'display' );
+					$label      = sanitize_term_field( 'name', $t->name, $t->term_id, $taxonomy, 'display' );
 					$out_html[] = $this->get_edit_link( $posts_in_term_qv, $label );
 				}
 				/* translators: used between list items, there is a space after the comma */
-				echo join( esc_html__( ', ', 'es-admin' ), $out_html ); // WPCS: XSS ok.
+				echo join( esc_html__( ', ', 'es-admin' ), $out_html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
 				echo '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . esc_html( $taxonomy_object->labels->no_terms ) . '</span>';
 			}
@@ -320,41 +321,41 @@ class Results_List_Table extends \WP_List_Table {
 	/**
 	 * Query and set the items to display in the table.
 	 */
-	function prepare_items() {
+	public function prepare_items() {
 		$per_page = 20;
 
-		$columns = $this->get_columns();
-		$hidden = array();
+		$columns  = $this->get_columns();
+		$hidden   = array();
 		$sortable = $this->get_sortable_columns();
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
 		// You can bypass Elasticsearch and instead use WP_Query by adding es=0
 		// to the url.
-		if ( isset( $_GET['es'] ) && '0' === $_GET['es'] ) {
+		if ( isset( $_GET['es'] ) && '0' === $_GET['es'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$args = [
-				'post_type' => get_post_types( [ 'public' => true ] ),
-				'post_status' => 'any',
-				'posts_per_page' => $per_page,
-				'paged' => $this->get_pagenum(),
+				'post_type'           => get_post_types( [ 'public' => true ] ),
+				'post_status'         => 'any',
+				'posts_per_page'      => $per_page,
+				'paged'               => $this->get_pagenum(),
 				'ignore_sticky_posts' => true,
-				'perm' => 'readable',
+				'perm'                => 'readable',
 			];
 
-			if ( ! empty( $_GET['s'] ) ) {
-				$args['s'] = sanitize_text_field( wp_unslash( $_GET['s'] ) );
+			if ( ! empty( $_GET['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$args['s']       = sanitize_text_field( wp_unslash( $_GET['s'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$args['orderby'] = 'relevance';
-				$args['order'] = 'DESC';
+				$args['order']   = 'DESC';
 			}
 
-			if ( ! empty( $_GET['orderby'] ) ) {
-				$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+			if ( ! empty( $_GET['orderby'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			}
-			if ( ! empty( $_GET['order'] ) ) {
-				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
+			if ( ! empty( $_GET['order'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			}
 
-			$query = new \WP_Query();
+			$query       = new \WP_Query();
 			$this->items = $query->query( $args );
 
 			$this->set_pagination_args( array(
@@ -366,7 +367,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Setup base filters.
 			// @todo remove post_types that the current user can't access.
-			$post_types = array_values( get_post_types( [ 'public' => true ] ) );
+			$post_types            = array_values( get_post_types( [ 'public' => true ] ) );
 			$exclude_post_statuses = array_values( get_post_stati( [ 'exclude_from_search' => true ] ) );
 
 			$facets = apply_filters( 'es_admin_configured_facets', [
@@ -378,22 +379,22 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Build the ES args.
 			$args = [
-				'query' => [
+				'query'   => [
 					'bool' => [
-						'filter' => [ DSL::terms( $es->map_field( 'post_type' ), $post_types ) ],
+						'filter'   => [ DSL::terms( $es->map_field( 'post_type' ), $post_types ) ],
 						'must_not' => DSL::terms( $es->map_field( 'post_status' ), $exclude_post_statuses ),
 					],
 				],
 				'_source' => [
 					'post_id',
 				],
-				'from' => 0,
-				'size' => $per_page,
+				'from'    => 0,
+				'size'    => $per_page,
 			];
 
 			// Build the search query.
-			if ( ! empty( $_GET['s'] ) ) {
-				$args['query']['bool']['must'][] = DSL::search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) );
+			if ( ! empty( $_GET['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$args['query']['bool']['must'][] = DSL::search_query( sanitize_text_field( wp_unslash( $_GET['s'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			}
 
 			// Setup pagination.
@@ -404,9 +405,9 @@ class Results_List_Table extends \WP_List_Table {
 			$args['from'] = ( $page - 1 ) * $per_page;
 
 			// Build the sorting.
-			if ( ! empty( $_GET['orderby'] ) ) {
-				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc'; // WPCS: sanitization ok.
-				switch ( $_GET['orderby'] ) {
+			if ( ! empty( $_GET['orderby'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$order = ( ! empty( $_GET['order'] ) && 'desc' === strtolower( $_GET['order'] ) ) ? 'desc' : 'asc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				switch ( $_GET['orderby'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					case 'relevance':
 						$orderby = '_score';
 						break;
@@ -422,7 +423,7 @@ class Results_List_Table extends \WP_List_Table {
 				$args['sort'] = [
 					[ $key => $order ],
 				];
-			} elseif ( ! empty( $_GET['s'] ) ) {
+			} elseif ( ! empty( $_GET['s'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$args['sort'] = [
 					'_score',
 					[ $es->map_field( 'post_date' ) => 'desc' ],
@@ -438,8 +439,8 @@ class Results_List_Table extends \WP_List_Table {
 			$aggs = [];
 			foreach ( $facets as $facet_type ) {
 				$aggs = array_merge( $aggs, $facet_type->request() );
-				if ( ! empty( $_GET['facets'][ $facet_type->query_var() ] ) ) {
-					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // WPCS: sanitization ok.
+				if ( ! empty( $_GET['facets'][ $facet_type->query_var() ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$values = array_map( 'sanitize_text_field', (array) $_GET['facets'][ $facet_type->query_var() ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, Generic.Formatting.MultipleStatementAlignment.NotSameWarning
 					$args['query']['bool']['filter'][] = $facet_type->filter( $values );
 				}
 			}
@@ -451,7 +452,7 @@ class Results_List_Table extends \WP_List_Table {
 
 			// Run the search.
 			$this->items = [];
-			$search = new Search( $args );
+			$search      = new Search( $args );
 			$es->set_main_search( $search );
 
 			if ( ! $search->has_hits() ) {
@@ -465,7 +466,7 @@ class Results_List_Table extends \WP_List_Table {
 					continue;
 				}
 
-				$post_id = (array) $hit['_source'][ $es->map_field( 'post_id' ) ];
+				$post_id    = (array) $hit['_source'][ $es->map_field( 'post_id' ) ];
 				$post_ids[] = absint( reset( $post_id ) );
 			}
 
@@ -475,21 +476,25 @@ class Results_List_Table extends \WP_List_Table {
 				return;
 			}
 
-			$query = new \WP_Query();
-			$this->items = $query->query( [
-				'post_type' => get_post_types(),
-				'post_status' => 'any',
-				'posts_per_page' => $per_page,
-				'ignore_sticky_posts' => true,
-				'perm' => 'readable',
-				'post__in' => $post_ids,
-				'orderby' => 'post__in',
-			] );
+			$query       = new \WP_Query();
+			$this->items = $query->query(
+				[
+					'post_type'           => get_post_types(),
+					'post_status'         => 'any',
+					'posts_per_page'      => $per_page,
+					'ignore_sticky_posts' => true,
+					'perm'                => 'readable',
+					'post__in'            => $post_ids,
+					'orderby'             => 'post__in',
+				]
+			);
 
-			$this->set_pagination_args( [
-				'total_items' => $search->total(),
-				'per_page'    => $per_page,
-			] );
+			$this->set_pagination_args(
+				[
+					'total_items' => $search->total(),
+					'per_page'    => $per_page,
+				]
+			);
 		}
 	}
 
@@ -525,7 +530,7 @@ class Results_List_Table extends \WP_List_Table {
 			esc_html( $label )
 		);
 		if ( $echo ) {
-			echo $link_html; // WPCS: XSS ok.
+			echo $link_html; // phpcs:ignore WordPress.Security.EscapeOutput.DeprecatedWhitelistCommentFound, WordPress.Security.EscapeOutput.OutputNotEscaped
 		} else {
 			return $link_html;
 		}
@@ -541,10 +546,10 @@ class Results_List_Table extends \WP_List_Table {
 	public function single_row( $post ) {
 		$post = get_post( $post );
 
-		$GLOBALS['post'] = $post; // WPCS: override ok.
+		$GLOBALS['post'] = $post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		setup_postdata( $post );
 
-		$classes = [];
+		$classes     = [];
 		$lock_holder = wp_check_post_lock( $post->ID );
 		if ( $lock_holder ) {
 			$classes[] = 'wp-locked';
@@ -571,11 +576,11 @@ class Results_List_Table extends \WP_List_Table {
 		}
 
 		$post_type_object = get_post_type_object( $post->post_type );
-		$can_edit_post = current_user_can( 'edit_post', $post->ID );
-		$actions = array();
-		$title = _draft_or_post_title();
+		$can_edit_post    = current_user_can( 'edit_post', $post->ID );
+		$actions          = array();
+		$title            = _draft_or_post_title();
 
-		if ( $can_edit_post && 'trash' != $post->post_status ) {
+		if ( $can_edit_post && 'trash' !== $post->post_status ) {
 			$actions['edit'] = sprintf(
 				'<a href="%s" aria-label="%s">%s</a>',
 				get_edit_post_link( $post->ID ),
@@ -615,9 +620,9 @@ class Results_List_Table extends \WP_List_Table {
 		}
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
-			if ( in_array( $post->post_status, array( 'pending', 'draft', 'future' ) ) ) {
+			if ( in_array( $post->post_status, array( 'pending', 'draft', 'future' ), true ) ) {
 				if ( $can_edit_post ) {
-					$preview_link = get_preview_post_link( $post );
+					$preview_link    = get_preview_post_link( $post );
 					$actions['view'] = sprintf(
 						'<a href="%s" rel="permalink" aria-label="%s">%s</a>',
 						esc_url( $preview_link ),
@@ -626,7 +631,7 @@ class Results_List_Table extends \WP_List_Table {
 						esc_html__( 'Preview', 'es-admin' )
 					);
 				}
-			} elseif ( 'trash' != $post->post_status ) {
+			} elseif ( 'trash' !== $post->post_status ) {
 				$actions['view'] = sprintf(
 					'<a href="%s" rel="permalink" aria-label="%s">%s</a>',
 					esc_url( get_permalink( $post->ID ) ),

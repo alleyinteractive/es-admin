@@ -28,18 +28,25 @@ class DSL {
 		 *
 		 * @var array
 		 */
-		$fields = apply_filters( 'es_admin_searchable_fields', [
-			$es->map_field( 'post_title.analyzed' ) . '^3',
-			$es->map_field( 'post_excerpt' ),
-			$es->map_field( 'post_content.analyzed' ),
-			$es->map_field( 'post_author.display_name' ),
-			$es->map_meta_field( '_wp_attachment_image_alt', 'analyzed' ),
-		] );
+		$fields = apply_filters(
+			'es_admin_searchable_fields',
+			[
+				$es->map_field( 'post_title.analyzed' ) . '^3',
+				$es->map_field( 'post_excerpt' ),
+				$es->map_field( 'post_content.analyzed' ),
+				$es->map_field( 'post_author.display_name' ),
+				$es->map_meta_field( '_wp_attachment_image_alt', 'analyzed' ),
+			]
+		);
 
-		return DSL::multi_match( $fields, $s, [
-			'operator' => 'and',
-			'type' => 'cross_fields',
-		] );
+		return self::multi_match(
+			$fields,
+			$s,
+			[
+				'operator' => 'and',
+				'type'     => 'cross_fields',
+			]
+		);
 	}
 
 	/**
@@ -54,9 +61,12 @@ class DSL {
 		$type = is_array( $values ) ? 'terms' : 'term';
 
 		return [
-			$type => array_merge( [
-				$field => $values,
-			], $args ),
+			$type => array_merge(
+				[
+					$field => $values,
+				],
+				$args
+			),
 		];
 	}
 
@@ -100,9 +110,12 @@ class DSL {
 		return [
 			'bool' => [
 				'must_not' => [
-					'exists' => array_merge( [
-						'field' => $field,
-					], $args ),
+					'exists' => array_merge(
+						[
+							'field' => $field,
+						],
+						$args
+					),
 				],
 			],
 		];
@@ -118,9 +131,12 @@ class DSL {
 	 */
 	public static function match( $field, $value, $args = [] ) {
 		return [
-			'match' => array_merge( [
-				$field => $value,
-			], $args ),
+			'match' => array_merge(
+				[
+					$field => $value,
+				],
+				$args
+			),
 		];
 	}
 
@@ -134,10 +150,13 @@ class DSL {
 	 */
 	public static function multi_match( $fields, $query, $args = [] ) {
 		return [
-			'multi_match' => array_merge( [
-				'query' => $query,
-				'fields' => (array) $fields,
-			], $args ),
+			'multi_match' => array_merge(
+				[
+					'query'  => $query,
+					'fields' => (array) $fields,
+				],
+				$args
+			),
 		];
 	}
 

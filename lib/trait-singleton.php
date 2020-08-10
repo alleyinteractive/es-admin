@@ -24,11 +24,11 @@ trait Singleton {
 	 * @return object
 	 */
 	public static function instance() {
-		if ( ! isset( static::$instance ) ) {
-			static::$instance = new static();
-			static::$instance->setup();
+		if ( ! isset( static::$instance ) ) { // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.StaticOutsideClass
+			static::$instance = new static(); // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.StaticOutsideClass
+			static::$instance->setup(); // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.StaticOutsideClass
 		}
-		return static::$instance;
+		return static::$instance; // phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis.StaticOutsideClass
 	}
 
 	/**
