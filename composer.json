@@ -1,0 +1,17 @@
+{
+	"name": "alleyinteractive/es-admin",
+	"type": "wordpress-plugin",
+	"description": "ES Admin",
+	"homepage": "https://github.com/alleyinteractive/es-admin",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "Alley",
+			"homepage": "https://alley.co/"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/alleyinteractive/es-admin/issues",
+		"source": "https://github.com/alleyinteractive/es-admin"
+	}
+}
